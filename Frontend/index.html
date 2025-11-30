@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thuê Xe Trực Tuyến</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- App Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Nút Admin (ẩn, chỉ hiện khi role = admin) -->
+    <a id="adminLink" href="admin.html" class="btn btn-warning rounded-pill px-3 d-none">Admin</a>
+    <a id="employeeLink" href="employee.html" class="btn btn-info rounded-pill px-3 d-none">Nhân viên</a>
+
+    <!-- Header / Navbar -->
+    <header class="bg-primary text-white p-3">
+        <div class="container d-flex justify-content-between align-items-center">
+            <!-- Logo + Brand -->
+            <div class="left-section d-flex align-items-center">
+                <a href="#top" class="brand-logo" aria-label="Về đầu trang">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdk1KSWlpLDRMeHJM6uZpOhHTWgzEzgDuU6ZKf1go82QKatnJwwUWcGVz3nC1JHMUHa34&usqp=CAU" class="logo" alt="Logo Du Lịch Ba Duy">
+                </a>
+                <h1 class="m-0 brand-title">Du Lịch Ba Duy</h1>
+            </div>
+
+            <!-- User / Actions -->
+            <div id="userSection" class="right-section d-flex align-items-center gap-2">
+                <!-- Tra cứu vé -->
+                <a href="check-booking.html" class="btn btn-primary rounded-pill px-3 text-white">Tra cứu vé</a>
+
+                <!-- Hiển thị tên người dùng sau khi đăng nhập -->
+                <span id="userName" class="me-2 fw-bold text-white d-none"></span>
+
+                <!-- Đăng xuất -->
+                <button id="logoutBtn" class="btn btn-danger rounded-pill px-3 d-none" type="button">Đăng Xuất</button>
+
+                <!-- Đăng nhập / Đăng ký (khi chưa đăng nhập) -->
+                <a id="loginBtn" href="login.html" class="btn btn-primary rounded-pill px-3">Đăng Nhập</a>
+                <a id="registerBtn" href="register.html" class="btn btn-success rounded-pill px-3">Đăng Ký</a>
+
+                <!-- Hotline dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-light rounded-pill d-flex align-items-center gap-2 px-4 py-2" type="button" id="hotlineDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.1rem; font-weight: 600;">
+            <img src="https://cdn-icons-png.freepik.com/512/3488/3488550.png" alt="Phone Icon" width="28" height="28"
+              class="rounded-circle bg-white p-1 shadow-sm" style="object-fit:contain;">
+            Hotline 24/7
+          </button>
+
+                    <ul class="dropdown-menu p-3" aria-labelledby="hotlineDropdown" style="min-width:280px;">
+                        <li>
+                            <a class="dropdown-item" href="tel:0123456789">
+                                <div class="fw-bold">0123456789</div>
+                                <small class="text-muted">Phản hồi dịch vụ & xử lý sự cố</small>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="tel:0123456789">
+                                <div class="fw-bold">0123456789</div>
+                                <small class="text-muted">Đặt vé qua điện thoại (24/7)</small>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="banner text-center d-flex align-items-center justify-content-center">
+        <div class="banner-overlay"></div>
+        <div class="banner-content">
+            <h2 class="display-5 display-md-4">Đặt Vé Xe Trực Tuyến Nhanh Chóng</h2>
+            <p class="lead">Tìm chuyến dễ dàng · Giá vé minh bạch · Thanh toán an toàn</p>
+
+            <a href="#searchSection" class="btn btn-warning btn-lg mt-3">Đặt Vé Ngay</a>
+        </div>
+    </section>
+
+    <!-- Search Box -->
+    <section class="search-section py-5" id="searchSection">
+        <div class="container">
+            <h2 class="text-center mb-4 text-primary section-title">Tìm Kiếm Chuyến Xe</h2>
+            <div class="search-box p-4 rounded-3 shadow-sm bg-white">
+                <form id="searchForm" class="row g-3 align-items-end justify-content-center">
+                    <!-- Tuyến đường -->
+                    <div class="col-md-3">
+                        <label for="route" class="form-label"><strong>Chọn tuyến đường</strong></label>
+                        <select id="route" class="form-select" required>
+              <option value="">Chọn tuyến đường</option>
+              <option value="Lagi - TP. Hồ Chí Minh">Lagi - TP. Hồ Chí Minh</option>
+              <option value="Lagi - Đà Lạt">Lagi - Đà Lạt</option>
+              <option value="Lagi - Nha Trang">Lagi - Nha Trang</option>
+            </select>
+                    </div>
+                    <!-- Điểm đón -->
+                    <div class="col-md-3">
+                        <label for="departure" class="form-label"><strong>Điểm đón</strong></label>
+                        <input type="text" id="departure" class="form-control" placeholder="Chọn điểm đón" list="pickupPoints" required>
+                        <datalist id="pickupPoints"></datalist>
+                    </div>
+                    <!-- Điểm đến -->
+                    <div class="col-md-3">
+                        <label for="destination" class="form-label"><strong>Điểm đến</strong></label>
+                        <input type="text" id="destination" class="form-control" placeholder="Chọn điểm đến" list="dropOffPoints" required>
+                        <datalist id="dropOffPoints"></datalist>
+                    </div>
+                    <!-- Ngày đi -->
+                    <div class="col-md-3">
+                        <label for="date" class="form-label"><strong>Ngày đi</strong></label>
+                        <input type="date" id="date" class="form-control" required>
+                    </div>
+                    <!-- Button tìm -->
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-find-trip w-100">Tìm chuyến xe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trip Results -->
+    <section class="trip-list py-5">
+        <div class="container">
+            <h2 class="text-center text-primary section-title">Danh Sách Chuyến Xe</h2>
+
+            <div id="tripResults">
+                <div class="trip-group">
+                    <div class="trip-group__header">
+                        <span class="dot dot--go"></span>
+                        <h3>Chiều đi</h3>
+                    </div>
+                    <div id="outboundResults" class="trip-grid"></div>
+                </div>
+
+                <div class="trip-group">
+                    <div class="trip-group__header">
+                        <span class="dot dot--back"></span>
+                        <h3>Chiều về</h3>
+                    </div>
+                    <div id="returnResults" class="trip-grid"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seat Modal -->
+    <div class="modal fade" id="seatModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+
+                <!-- header + 5 bước -->
+                <div class="modal-header flex-column align-items-start gap-2">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <h5 class="modal-title mb-0">Chọn ghế (15 chỗ)</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <!-- thanh 5 bước -->
+                    <div class="d-flex align-items-center flex-wrap gap-2" style="font-size:.72rem">
+                        <!-- B1 -->
+                        <div class="d-flex align-items-center gap-1">
+                            <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width:26px;height:26px;background:rgba(10,160,110,.12);color:#0f766e;font-weight:600;">
+                1
+              </span>
+                            <span class="text-success fw-semibold">Chọn chuyến</span>
+                        </div>
+                        <span style="width:32px;height:2px;background:rgba(148,163,184,.35);"></span>
+                        <!-- B2 (active) -->
+                        <div class="d-flex align-items-center gap-1">
+                            <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width:26px;height:26px;background:#0A5AD7;color:white;font-weight:700;box-shadow:0 4px 10px rgba(10,90,215,.3);">
+                2
+              </span>
+                            <span class="fw-semibold" style="color:#0f172a;">Chọn ghế</span>
+                        </div>
+                        <span style="width:32px;height:2px;background:rgba(148,163,184,.35);"></span>
+                        <!-- B3 -->
+                        <div class="d-flex align-items-center gap-1 text-muted">
+                            <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width:26px;height:26px;background:#e2e8f0;color:#475569;font-weight:600;">
+                3
+              </span>
+                            <span>Thông tin</span>
+                        </div>
+                        <span style="width:32px;height:2px;background:rgba(148,163,184,.35);"></span>
+                        <!-- B4 -->
+                        <div class="d-flex align-items-center gap-1 text-muted">
+                            <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width:26px;height:26px;background:#e2e8f0;color:#475569;font-weight:600;">
+                4
+              </span>
+                            <span>Thanh toán</span>
+                        </div>
+                        <span style="width:32px;height:2px;background:rgba(148,163,184,.35);"></span>
+                        <!-- B5 -->
+                        <div class="d-flex align-items-center gap-1 text-muted">
+                            <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width:26px;height:26px;background:#e2e8f0;color:#475569;font-weight:600;">
+                5
+              </span>
+                            <span>Hoàn tất</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-body">
+                    <div id="seatMeta" class="mb-2 text-muted"></div>
+                    <div id="seatGrid" class="d-flex flex-column gap-2"></div>
+                    <div class="mt-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="badge bg-secondary me-2">Trống</span>
+                            <span class="badge bg-warning text-dark me-2">Đang giữ</span>
+                            <span class="badge bg-danger me-2">Đã bán</span>
+                            <span class="badge bg-primary">Đã chọn</span>
+                        </div>
+                        <button id="btnHold" class="btn btn-primary" disabled>Tiếp tục</button>
+                    </div>
+                    <div id="seatMsg" class="mt-2 small text-muted"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== BẮT ĐẦU KHỐI ĐÁNH GIÁ DỊCH VỤ ====== -->
+    <section class="reviews-wrapper" id="reviewsSection">
+        <div class="reviews-grid">
+            <!-- CỘT TRÁI: TỔNG HỢP + DANH SÁCH -->
+            <div class="reviews-left">
+                <!-- Tổng quan rating -->
+                <div class="rating-summary-card">
+                    <div class="rating-score">
+                        <span id="ratingAverage">0.0</span>
+                        <div class="rating-stars" id="ratingSummaryStars">
+                            <!-- sao sẽ render bằng JS -->
+                        </div>
+                        <p class="rating-label">Điểm trung bình</p>
+                    </div>
+                    <div class="rating-meta">
+                        <p class="rating-count">
+                            <span id="ratingCount">0</span> lượt đánh giá
+                        </p>
+                        <p class="rating-note">
+                            Từ những khách đã đặt vé và hoàn tất chuyến đi.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Header danh sách + filter -->
+                <div class="reviews-list-header">
+                    <div class="reviews-list-header-left">
+                        <h3>Ý kiến từ khách hàng</h3>
+                        <span id="reviewsListCountBadge" class="pill-badge">0 đánh giá</span>
+                    </div>
+                    <div class="reviews-list-header-right">
+                        <select id="reviewsStarFilter" class="reviews-filter-select">
+            <option value="0">Tất cả số sao</option>
+            <option value="5">Chỉ 5 sao</option>
+            <option value="4">Từ 4 sao trở lên</option>
+            <option value="3">Từ 3 sao trở lên</option>
+            <option value="2">Từ 2 sao trở lên</option>
+            <option value="1">Tất cả (1+)</option>
+          </select>
+                        <button type="button" id="reviewsToggleBtn" class="reviews-toggle-btn">
+            Xem tất cả
+          </button>
+                    </div>
+                </div>
+
+                <!-- Danh sách đánh giá -->
+                <div id="reviewsList" class="reviews-list"></div>
+                <div id="reviewsEmpty" class="reviews-empty" style="display:none;">
+                    Chưa có đánh giá nào. Hãy là người đầu tiên chia sẻ trải nghiệm của bạn!
+                </div>
+            </div>
+
+            <!-- CỘT PHẢI: FORM GỬI ĐÁNH GIÁ -->
+            <div class="reviews-right">
+                <h2 class="review-title">Chia sẻ trải nghiệm chuyến đi</h2>
+                <p class="review-subtitle">
+                    Đánh giá giúp Ba Duy Bus cải thiện chất lượng phục vụ. Chỉ khách đã từng đặt vé bằng số điện thoại này mới gửi được đánh giá.
+                </p>
+
+                <form id="reviewForm" class="review-form">
+                    <!-- SỐ ĐIỆN THOẠI -->
+                    <div class="form-group">
+                        <label for="rvPhone">Số điện thoại đã đặt vé <span class="required">*</span></label>
+                        <input type="tel" id="rvPhone" class="form-control" placeholder="VD: 0347 448 344" maxlength="15" />
+                        <small class="form-text-muted">
+            Hệ thống sẽ kiểm tra xem số này đã từng đặt và hoàn tất vé hay chưa.
+          </small>
+                    </div>
+
+                    <!-- ĐÁNH GIÁ SAO -->
+                    <div class="form-group">
+                        <label>Chất lượng dịch vụ <span class="required">*</span></label>
+                        <div class="rating-input">
+                            <input type="radio" id="star5" name="rating" value="5" checked />
+                            <label for="star5" title="Rất hài lòng">★</label>
+
+                            <input type="radio" id="star4" name="rating" value="4" />
+                            <label for="star4" title="Hài lòng">★</label>
+
+                            <input type="radio" id="star3" name="rating" value="3" />
+                            <label for="star3" title="Bình thường">★</label>
+
+                            <input type="radio" id="star2" name="rating" value="2" />
+                            <label for="star2" title="Chưa tốt">★</label>
+
+                            <input type="radio" id="star1" name="rating" value="1" />
+                            <label for="star1" title="Tệ">★</label>
+                        </div>
+                    </div>
+
+                    <!-- NỘI DUNG NHẬN XÉT -->
+                    <div class="form-group">
+                        <label for="rvComment">Nhận xét của bạn <span class="required">*</span></label>
+                        <textarea id="rvComment" class="form-control" rows="4" placeholder="Chia sẻ trải nghiệm chuyến đi của bạn..."></textarea>
+                    </div>
+
+                    <button type="submit" id="btnSubmitReview" class="btn-primary w-100">
+          Gửi đánh giá
+        </button>
+
+                    <div id="reviewMessage" class="review-message" style="display:none;"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white text-center p-3">
+        &copy; Nhà Xe Ba Duy.
+    </footer>
+
+    <!-- Bootstrap JS (bundle) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- App JS -->
+    <script src="script.js"></script>
+
+    <!-- Script xử lý đăng nhập / logout / hiển thị Admin -->
+    <script>
+        (function() {
+            const API_BASE = 'http://127.0.0.1:3000';
+            const userNameEl = document.getElementById('userName');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const adminLink = document.getElementById('adminLink');
+            const employeeLink = document.getElementById('employeeLink');
+
+            function getUser() {
+                try {
+                    return JSON.parse(localStorage.getItem('user') || 'null');
+                } catch {
+                    return null;
+                }
+            }
+
+            function renderAuthUI() {
+                var user = getUser();
+                if (user && user.username) {
+                    userNameEl.textContent = '👋 Xin chào, ' + user.username;
+                    userNameEl.classList.remove('d-none');
+                    logoutBtn.classList.remove('d-none');
+                    if (loginBtn) loginBtn.classList.add('d-none');
+                    if (registerBtn) registerBtn.classList.add('d-none');
+
+                    if (user.role === 'admin') {
+                        if (adminLink) adminLink.classList.remove('d-none');
+                        if (employeeLink) employeeLink.classList.remove('d-none');
+                    } else if (user.role === 'employee') {
+                        if (adminLink) adminLink.classList.add('d-none');
+                        if (employeeLink) employeeLink.classList.remove('d-none');
+                    } else {
+                        if (adminLink) adminLink.classList.add('d-none');
+                        if (employeeLink) employeeLink.classList.add('d-none');
+                    }
+
+                } else {
+                    userNameEl.classList.add('d-none');
+                    logoutBtn.classList.add('d-none');
+                    if (loginBtn) loginBtn.classList.remove('d-none');
+                    if (registerBtn) registerBtn.classList.remove('d-none');
+                    if (adminLink) adminLink.classList.add('d-none');
+                    if (employeeLink) employeeLink.classList.add('d-none');
+                }
+            }
+
+            async function validateToken() {
+                var token = localStorage.getItem('token');
+                if (!token) return;
+                try {
+                    var res = await fetch(API_BASE + '/api/auth/me', {
+                        headers: {
+                            Authorization: 'Bearer ' + token
+                        },
+                        credentials: 'include'
+                    });
+                    if (res.ok) {
+                        var data = await res.json();
+                        localStorage.setItem('user', JSON.stringify(data));
+                    } else {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                    }
+                } catch (err) {
+                    console.warn('Token check error', err);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                }
+            }
+
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async function() {
+                    try {
+                        await fetch(API_BASE + '/api/auth/logout', {
+                            method: 'POST',
+                            credentials: 'include'
+                        }).catch(function() {});
+                    } finally {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        renderAuthUI();
+                        location.reload();
+                    }
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', async() => {
+                await validateToken();
+                renderAuthUI();
+            });
+
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'user' || e.key === 'token') renderAuthUI();
+            });
+        })();
+    </script>
+
+    <!-- Chat box khách hàng: dùng REST /api/chat -->
+    <script>
+        const CHAT_API_BASE = 'http://127.0.0.1:3000'; // sửa nếu backend/ngrok khác
+
+        (function() {
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = `
+<!-- Nút mở lại chat (khi đóng) -->
+<button id="chatOpenBtn" style="
+  position:fixed; right:20px; bottom:20px;
+  width:60px; height:60px; border-radius:50%;
+  border:none; background:#0d6efd; color:white;
+  display:none; justify-content:center; align-items:center;
+  font-size:26px; box-shadow:0 4px 12px rgba(0,0,0,.25);
+  z-index:99999; cursor:pointer;
+">
+  💬
+</button>
+
+<!-- Hộp chat -->
+<div id="chatBox" style="
+  position:fixed; right:20px; bottom:20px;
+  width:330px; height:440px;
+  background:#fff; border-radius:14px;
+  box-shadow:0 4px 18px rgba(0,0,0,.25);
+  display:flex; flex-direction:column;
+  overflow:hidden; z-index:99999;
+">
+  <div id="chatHeader" style="
+    background:#0d6efd; color:white;
+    padding:10px 14px; display:flex;
+    justify-content:space-between;
+    align-items:center; font-weight:bold;
+  ">
+    <span>Hỗ trợ đặt vé</span>
+    <button id="chatClose"
+      style="border:none;background:transparent;color:white;font-size:18px;font-weight:bold;cursor:pointer;">
+      ×
+    </button>
+  </div>
+
+  <div id="chatMessages" style="
+    flex:1; padding:8px; overflow-y:auto;
+    background:#f7f7f7;
+  "></div>
+
+  <div id="chatInputWrap" style="display:flex;border-top:1px solid #ccc;">
+    <input id="chatInput"
+      style="flex:1;border:none;padding:10px;"
+      placeholder="Nhập tin nhắn...">
+    <button id="chatSend"
+      style="background:#0d6efd;color:white;border:none;padding:10px 14px;">
+      Gửi
+    </button>
+  </div>
+</div>
+`;
+            document.body.appendChild(wrapper);
+
+            const chatBox = document.getElementById('chatBox');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+            const chatSend = document.getElementById('chatSend');
+            const chatClose = document.getElementById('chatClose');
+            const chatOpenBtn = document.getElementById('chatOpenBtn');
+
+            // ===== ĐÓNG CHATBOX (×) -> hiện nút 💬 =====
+            chatClose.onclick = () => {
+                chatBox.style.display = 'none';
+                chatOpenBtn.style.display = 'flex';
+            };
+
+            // ===== MỞ LẠI CHATBOX TỪ NÚT 💬 =====
+            chatOpenBtn.onclick = (e) => {
+                // Nếu vừa kéo thì không mở chat khi thả chuột
+                if (chatOpenBtn.__dragging) return;
+
+                chatBox.style.display = 'flex';
+                chatOpenBtn.style.display = 'none';
+            };
+
+            // ===== KÉO THẢ NÚT 💬 + SNAP 12 VỊ TRÍ =====
+            (function makeDraggable(btn) {
+                let isDown = false;
+                let offsetX = 0;
+                let offsetY = 0;
+
+                // Tạo 12 vị trí snap (theo kích thước màn hình hiện tại)
+                function getSnapPositions() {
+                    const margin = 10;
+                    const w = btn.offsetWidth;
+                    const h = btn.offsetHeight;
+
+                    const maxX = window.innerWidth - w - margin;
+                    const maxY = window.innerHeight - h - margin;
+
+                    const midX = (window.innerWidth - w) / 2;
+                    const midY = (window.innerHeight - h) / 2;
+
+                    const quarterX = (window.innerWidth - w) / 4;
+                    const threeQX = 3 * (window.innerWidth - w) / 4;
+
+                    return [
+                        // 6 vị trí cạnh trái / phải (trên – giữa – dưới)
+                        {
+                            left: margin,
+                            top: margin
+                        }, {
+                            left: margin,
+                            top: midY
+                        }, {
+                            left: margin,
+                            top: maxY
+                        },
+
+                        {
+                            left: maxX,
+                            top: margin
+                        }, {
+                            left: maxX,
+                            top: midY
+                        }, {
+                            left: maxX,
+                            top: maxY
+                        },
+
+                        // 6 vị trí cạnh trên / dưới (4 điểm chia đều + 2 giữa)
+                        {
+                            left: quarterX,
+                            top: margin
+                        }, {
+                            left: midX,
+                            top: margin
+                        }, {
+                            left: threeQX,
+                            top: margin
+                        },
+
+                        {
+                            left: quarterX,
+                            top: maxY
+                        }, {
+                            left: midX,
+                            top: maxY
+                        }, {
+                            left: threeQX,
+                            top: maxY
+                        },
+                    ];
+                }
+
+                function snapToNearest() {
+                    const rect = btn.getBoundingClientRect();
+                    const w = btn.offsetWidth;
+                    const h = btn.offsetHeight;
+
+                    const centerX = rect.left + w / 2;
+                    const centerY = rect.top + h / 2;
+
+                    const positions = getSnapPositions();
+                    let best = positions[0];
+                    let minDist = Infinity;
+
+                    for (let i = 0; i < positions.length; i++) {
+                        const p = positions[i];
+                        const cx = p.left + w / 2;
+                        const cy = p.top + h / 2;
+                        const d = (cx - centerX) * (cx - centerX) + (cy - centerY) * (cy - centerY);
+                        if (d < minDist) {
+                            minDist = d;
+                            best = p;
+                        }
+                    }
+
+                    btn.style.left = best.left + 'px';
+                    btn.style.top = best.top + 'px';
+                }
+
+                function startDrag(clientX, clientY) {
+                    isDown = true;
+                    btn.__dragging = true;
+
+                    // chuyển từ right/bottom sang left/top nếu chưa có
+                    if (!btn.style.left && !btn.style.top) {
+                        const rect = btn.getBoundingClientRect();
+                        btn.style.left = rect.left + 'px';
+                        btn.style.top = rect.top + 'px';
+                        btn.style.right = 'auto';
+                        btn.style.bottom = 'auto';
+                    }
+
+                    offsetX = clientX - btn.offsetLeft;
+                    offsetY = clientY - btn.offsetTop;
+                }
+
+                function doDrag(clientX, clientY) {
+                    if (!isDown) return;
+
+                    let x = clientX - offsetX;
+                    let y = clientY - offsetY;
+
+                    const margin = 4;
+                    const maxX = window.innerWidth - btn.offsetWidth - margin;
+                    const maxY = window.innerHeight - btn.offsetHeight - margin;
+
+                    if (x < margin) x = margin;
+                    if (y < margin) y = margin;
+                    if (x > maxX) x = maxX;
+                    if (y > maxY) y = maxY;
+
+                    btn.style.left = x + 'px';
+                    btn.style.top = y + 'px';
+                }
+
+                function endDrag() {
+                    if (!isDown) return;
+                    isDown = false;
+                    snapToNearest(); // <- hút về vị trí gần nhất
+
+                    // Sau 150ms cho phép click lại bình thường
+                    setTimeout(() => {
+                        btn.__dragging = false;
+                    }, 150);
+                }
+
+                // Chuột
+                btn.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    startDrag(e.clientX, e.clientY);
+                });
+                document.addEventListener('mousemove', (e) => {
+                    doDrag(e.clientX, e.clientY);
+                });
+                document.addEventListener('mouseup', () => {
+                    endDrag();
+                });
+
+                // Cảm ứng
+                btn.addEventListener('touchstart', (e) => {
+                    const t = e.touches[0];
+                    startDrag(t.clientX, t.clientY);
+                }, {
+                    passive: false
+                });
+
+                document.addEventListener('touchmove', (e) => {
+                    if (!isDown) return;
+                    const t = e.touches[0];
+                    doDrag(t.clientX, t.clientY);
+                }, {
+                    passive: false
+                });
+
+                document.addEventListener('touchend', () => {
+                    endDrag();
+                });
+            })(chatOpenBtn);
+
+
+            // ===== HIỂN THỊ MESSAGE TRONG KHUNG CHAT =====
+            function addMsg(text, mine = false) {
+                const div = document.createElement('div');
+                div.style.margin = '6px 0';
+                div.style.textAlign = mine ? 'right' : 'left';
+                div.innerHTML = `
+<span style="
+  display:inline-block; padding:8px 12px;
+  border-radius:12px; max-width:75%;
+  white-space:pre-line;
+  background:${mine ? '#0d6efd' : '#e9e9e9'};
+  color:${mine ? 'white' : 'black'};
+">${text}</span>`;
+                chatMessages.appendChild(div);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // ===== GỬI TIN NHẮN LÊN BACKEND =====
+            async function sendChat() {
+                const text = chatInput.value.trim();
+                if (!text) return;
+
+                addMsg(text, true);
+                chatInput.value = '';
+
+                try {
+                    const res = await fetch(CHAT_API_BASE + '/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            text
+                        })
+                    });
+
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                        addMsg('⚠️ Lỗi server, vui lòng thử lại sau.');
+                        return;
+                    }
+                    addMsg(data.reply || '(Bot không trả lời)');
+                } catch (err) {
+                    console.error('Chat error:', err);
+                    addMsg('⚠️ Không kết nối được máy chủ.');
+                }
+            }
+
+            chatSend.onclick = sendChat;
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') sendChat();
+            });
+
+            // Lời chào mặc định
+            addMsg('🤖 Bot: Xin chào! Bạn có thể hỏi: "Giá vé Lagi đi Đà Lạt ngày mai?", "Giờ chạy Lagi – HCM hôm nay?" ...');
+        })();
+    </script>
+
+
+
+</body>
+
+</html>

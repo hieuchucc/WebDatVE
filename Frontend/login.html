@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* === BACKGROUND IMAGE === */
+            background: url("https://png.pngtree.com/background/20250104/original/pngtree-free-hd-wallpaper-4k-new-background-picture-image_15546678.jpg") no-repeat center center / cover;
+            position: relative;
+        }
+        /* Lớp mờ phía sau container cho dễ nhìn */
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.70);
+            /* chỉnh độ mờ */
+            backdrop-filter: blur(1px);
+            z-index: 0;
+        }
+        
+        .container {
+            width: 1000px;
+            height: 520px;
+            background: #fff;
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex;
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+            /* giúp nằm trên overlay */
+        }
+        /* LEFT PANEL */
+        
+        .left-box {
+            width: 50%;
+            background: linear-gradient(to right, #007bff, #00c6ff);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .left-box h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .left-box p {
+            font-size: 16px;
+            opacity: 0.95;
+            width: 80%;
+            margin-bottom: 25px;
+        }
+        
+        .left-box button {
+            padding: 12px 32px;
+            border-radius: 30px;
+            border: 2px solid white;
+            background: transparent;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .3s;
+        }
+        
+        .left-box button:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        /* RIGHT PANEL */
+        
+        .right-box {
+            width: 50%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .right-box h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+        
+        #alertHost {
+            margin-bottom: 10px;
+            min-height: 20px;
+            width: 100%;
+            max-width: 380px;
+        }
+        /* FORM */
+        
+        form {
+            width: 100%;
+            max-width: 380px;
+            /* NGĂN TRÀN SANG TRÁI */
+        }
+        
+        .input-group {
+            margin-bottom: 18px;
+            position: relative;
+            width: 100%;
+        }
+        
+        .input-group input {
+            width: 290px;
+            padding: 12px 45px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            background: #eef3ff;
+            font-size: 15px;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: gray;
+            font-size: 18px;
+        }
+        /* BUTTON */
+        
+        #loginBtn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            background: linear-gradient(to right, #007bff, #00c6ff);
+            color: white;
+            margin-top: 10px;
+        }
+        
+        #loginBtn:hover {
+            opacity: .9;
+        }
+        
+        .forgot {
+            display: block;
+            text-align: right;
+            font-size: 13px;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        
+        .back-home {
+            margin-top: 12px;
+            text-align: center;
+        }
+        
+        .back-home a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- LEFT -->
+        <div class="left-box">
+            <h1>Chào mừng bạn!</h1>
+            <p>Đồng hành cùng bạn trên mọi chuyến đi – đăng ký để trải nghiệm tiện ích tối ưu.</p>
+            <button onclick="window.location.href='register.html'">Đăng ký ngay</button>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right-box">
+            <h2>Đăng Nhập</h2>
+
+            <div id="alertHost"></div>
+
+            <form id="loginForm">
+
+                <div class="input-group">
+                    <i class="fa fa-user"></i>
+                    <input type="text" id="identifier" placeholder="Email hoặc Số điện thoại" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa fa-lock"></i>
+                    <input type="password" id="password" placeholder="Mật khẩu" required>
+                </div>
+
+                <a href="forgot.html" class="forgot">Quên mật khẩu?</a>
+
+                <button id="loginBtn">Đăng nhập</button>
+
+                <div class="back-home">
+                    <a href="index.html">← Quay lại Trang Chủ</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        const API_BASE = "http://localhost:3000";
+        const LOGIN_ENDPOINT = API_BASE + "/api/auth/login";
+
+        const alertHost = document.getElementById("alertHost");
+        const loginBtn = document.getElementById("loginBtn");
+
+        function showAlert(type, msg) {
+            alertHost.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+        }
+
+        document.getElementById("loginForm").addEventListener("submit", async(e) => {
+            e.preventDefault();
+            alertHost.innerHTML = "";
+
+            const identifier = document.getElementById("identifier").value.trim().toLowerCase();
+            const passwordValue = password.value;
+
+            if (!identifier || !passwordValue) {
+                return showAlert("warning", "Vui lòng nhập đủ thông tin.");
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = "Đang đăng nhập...";
+
+            try {
+                const res = await fetch(LOGIN_ENDPOINT, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        identifier: identifier,
+                        password: passwordValue
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = "Đăng nhập";
+                    return showAlert("danger", data.message || "Đăng nhập thất bại.");
+                }
+
+                // Lưu thông tin người dùng
+                localStorage.setItem("token", data.accessToken);
+                localStorage.setItem("user", JSON.stringify(data.user));
+
+                showAlert("success", "Đăng nhập thành công!");
+
+                // ⭐ Redirect về trang trước (Checkout)
+                const back = localStorage.getItem("redirectBack");
+                if (back) {
+                    localStorage.removeItem("redirectBack");
+                    setTimeout(() => window.location.href = back, 500);
+                } else {
+                    setTimeout(() => window.location.href = "index.html", 500);
+                }
+
+            } catch (err) {
+                showAlert("danger", "Không thể kết nối máy chủ.");
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = "Đăng nhập";
+            }
+        });
+    </script>
+</body>
+
+</html>

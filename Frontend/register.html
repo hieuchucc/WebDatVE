@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng Ký Tài Khoản</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* === BACKGROUND IMAGE === */
+            background: url("https://png.pngtree.com/background/20250104/original/pngtree-free-hd-wallpaper-4k-new-background-picture-image_15546678.jpg") no-repeat center center / cover;
+            position: relative;
+        }
+        /* Lớp mờ phía sau container cho dễ nhìn */
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.70);
+            /* chỉnh độ mờ */
+            backdrop-filter: blur(1px);
+            z-index: 0;
+        }
+        
+        .container {
+            width: 1000px;
+            height: 520px;
+            background: #fff;
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex;
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+            /* giúp nằm trên overlay */
+        }
+        /* LEFT PANEL */
+        
+        .left-box {
+            width: 50%;
+            padding: 45px 50px;
+        }
+        
+        .left-box h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        #alertHost {
+            margin-bottom: 15px;
+            max-width: 380px;
+        }
+        /* INPUT GROUP */
+        
+        .input-group {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            margin-top: 8px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 45px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            background: #eef3ff;
+            font-size: 15px;
+        }
+        
+        .input-group i {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            font-size: 18px;
+            color: gray;
+        }
+        
+        .error {
+            width: 100%;
+            max-width: 380px;
+            font-size: 13px;
+            color: red;
+            margin: 3px 0 6px;
+        }
+        /* BUTTON */
+        
+        #submitBtn {
+            width: 100%;
+            max-width: 380px;
+            padding: 12px;
+            border-radius: 30px;
+            background: linear-gradient(to right, #007bff, #00c6ff);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        #submitBtn:hover {
+            opacity: 0.9;
+        }
+        /* BACK HOME */
+        
+        .back-home {
+            max-width: 380px;
+            margin-top: 12px;
+        }
+        
+        .back-home a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        /* RIGHT PANEL */
+        
+        .right-box {
+            width: 50%;
+            background: linear-gradient(to bottom right, #007bff, #003b64);
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .right-box h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+        
+        .right-box button {
+            margin-top: 25px;
+            padding: 12px 35px;
+            border-radius: 30px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .right-box button:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- LEFT PANEL -->
+        <div class="left-box">
+            <h2>Đăng ký tài khoản</h2>
+
+            <div id="alertHost"></div>
+
+            <form id="registerForm" novalidate>
+
+                <!-- USERNAME -->
+                <div class="input-group">
+                    <i class="fa fa-user"></i>
+                    <input type="text" id="username" placeholder="Tên đăng nhập" required>
+                </div>
+                <div id="errUsername" class="error"></div>
+
+                <!-- EMAIL -->
+                <div class="input-group">
+                    <i class="fa fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Email" required>
+                </div>
+                <div id="errEmail" class="error"></div>
+
+                <!-- PHONE -->
+                <div class="input-group">
+                    <i class="fa fa-phone"></i>
+                    <input type="tel" id="phone" placeholder="Số điện thoại" required maxlength="10">
+                </div>
+                <div id="errPhone" class="error"></div>
+
+                <!-- PASSWORD -->
+                <div class="input-group">
+                    <i class="fa fa-lock"></i>
+                    <input type="password" id="password" placeholder="Mật khẩu" required>
+                </div>
+                <div id="errPassword" class="error"></div>
+
+                <button type="submit" id="submitBtn">Đăng ký</button>
+
+                <div class="back-home">
+                    <a href="index.html">← Quay lại trang chủ</a>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="right-box">
+            <h1>Chào mừng bạn!</h1>
+            <p>Tham gia hệ thống đặt vé xe khách Ba Duy để trải nghiệm đặt vé an toàn và tiện lợi.</p>
+            <button onclick="location.href='login.html'">Đăng nhập</button>
+        </div>
+
+    </div>
+
+</body>
+
+
+</html>
+
+
+<script>
+    const API_BASE = "http://localhost:3000";
+    const REGISTER_ENDPOINT = API_BASE + "/api/auth/register";
+
+    const form = document.getElementById("registerForm");
+    const alertHost = document.getElementById("alertHost");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function showAlert(type, msg) {
+        alertHost.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+    }
+
+    // ===== VALIDATION FUNCTION =====
+    function validateInput() {
+        let ok = true;
+
+        const u = username.value.trim().toLowerCase();
+        const e = email.value.trim().toLowerCase();
+        const p = phone.value.trim();
+        const pw = password.value;
+
+        // Reset lỗi
+        errUsername.textContent = "";
+        errEmail.textContent = "";
+        errPhone.textContent = "";
+        errPassword.textContent = "";
+
+        /// USERNAME — cho phép tiếng Việt + khoảng trắng + số
+        if (!/^[A-Za-zÀ-ỹ0-9 ]{3,32}$/.test(username.value.trim())) {
+            errUsername.textContent = "Tên đăng nhập cho phép chữ có dấu, số và khoảng trắng (3–32 ký tự).";
+            ok = false;
+        }
+
+
+        // EMAIL
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
+            errEmail.textContent = "Email không hợp lệ.";
+            ok = false;
+        }
+
+        // PHONE (VN): 10 số, bắt đầu bằng 0
+        if (!/^0\d{9}$/.test(p)) {
+            errPhone.textContent = "Số điện thoại phải gồm 10 số và bắt đầu bằng 0.";
+            ok = false;
+        }
+
+        // PASSWORD: ít nhất 6 ký tự, phải có chữ + số
+        if (!/^(?=.*[a-zA-Z])(?=.*\d).{6,}$/.test(pw)) {
+            errPassword.textContent = "Mật khẩu tối thiểu 6 ký tự, gồm chữ và số.";
+            ok = false;
+        }
+
+        return ok;
+    }
+
+    // ===== SUBMIT =====
+    form.addEventListener("submit", async(e) => {
+        e.preventDefault();
+        alertHost.innerHTML = "";
+
+        if (!validateInput()) return; // ❌ Dừng nếu có lỗi
+
+        const payload = {
+            username: username.value.trim().toLowerCase(),
+            email: email.value.trim().toLowerCase(),
+            phone: phone.value.trim(),
+            password: password.value
+        };
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Đang xử lý...";
+
+        try {
+            const res = await fetch(REGISTER_ENDPOINT, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload),
+                credentials: "include"
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                return showAlert("danger", data.message || "Đăng ký thất bại.");
+            }
+
+            localStorage.setItem("token", data.accessToken);
+            localStorage.setItem("user", JSON.stringify(data.user));
+
+            showAlert("success", "Đăng ký thành công! Đang chuyển lại trang đặt vé...");
+
+            // Lấy URL cần quay lại
+            const back = localStorage.getItem("redirectBack");
+
+            // Nếu có redirectBack thì quay lại chỗ đang đặt vé
+            if (back) {
+                setTimeout(() => {
+                    location.href = back;
+                }, 600);
+            } else {
+                // Không có thì về trang chủ
+                setTimeout(() => {
+                    location.href = "index.html";
+                }, 600);
+            }
+
+
+        } catch (err) {
+            showAlert("danger", "Không thể kết nối máy chủ.");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Đăng ký";
+        }
+    });
+</script>
+
+</body>
+
+</html>

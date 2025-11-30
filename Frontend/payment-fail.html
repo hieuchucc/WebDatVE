@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thanh toán thất bại</title>
+    <style>
+         :root {
+            --primary: #0aa06e;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --text: #0f172a;
+            --muted: #94a3b8;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            background: var(--bg);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 32px 16px;
+            gap: 20px;
+        }
+        /* ===== top bar (5 bước) ===== */
+        
+        .topbar {
+            width: min(980px, 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .back-btn {
+            background: #fff;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: 999px;
+            padding: .35rem .75rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            color: var(--danger);
+            font-weight: 600;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, .06);
+        }
+        
+        .steps {
+            display: flex;
+            gap: .4rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            white-space: nowrap;
+        }
+        
+        .step-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: #fff;
+            border: 2px solid rgba(148, 163, 184, .3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .7rem;
+            font-weight: 700;
+            color: #475569;
+        }
+        
+        .step-label {
+            font-size: .74rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        
+        .step-line {
+            width: 32px;
+            height: 2px;
+            background: rgba(148, 163, 184, .35);
+        }
+        
+        .step-item.is-done .step-badge {
+            background: rgba(10, 160, 110, 0.12);
+            border-color: rgba(10, 160, 110, 0.35);
+            color: #0f766e;
+        }
+        
+        .step-item.is-done .step-label {
+            color: #0f766e;
+            font-weight: 600;
+        }
+        
+        .step-item.is-active .step-badge {
+            background: var(--danger);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+        }
+        
+        .step-item.is-active .step-label {
+            color: var(--danger);
+            font-weight: 700;
+        }
+        /* ===== card ===== */
+        
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            width: min(520px, 100%);
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+            padding: 28px 28px 22px;
+            text-align: center;
+        }
+        
+        .badge {
+            width: 64px;
+            height: 64px;
+            border-radius: 999px;
+            background: rgba(239, 68, 68, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 34px;
+            color: var(--danger);
+        }
+        
+        h1 {
+            font-size: 1.4rem;
+            margin: 0 0 8px;
+            color: var(--text);
+        }
+        
+        p.sub {
+            margin: 0 0 18px;
+            color: #475569;
+            font-size: 0.92rem;
+        }
+        
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            text-align: left;
+            margin-bottom: 16px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #0f172a;
+        }
+        
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .label {
+            color: #64748b;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        
+        a.btn {
+            flex: 1;
+            text-decoration: none;
+            background: var(--danger);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: 0.2s;
+        }
+        
+        a.btn.secondary {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+        
+        a.btn:hover {
+            filter: brightness(0.95);
+        }
+        
+        .note {
+            margin-top: 14px;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+        
+        @media (max-width: 640px) {
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .step-label {
+                display: none;
+            }
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Thanh trạng thái 5 bước -->
+    <div class="topbar">
+        <a href="index.html" class="back-btn">← Trang chủ</a>
+        <div class="steps">
+            <div class="step-item is-done">
+                <span class="step-badge">1</span>
+                <span class="step-label">Chọn chuyến</span>
+                <span class="step-line"></span>
+            </div>
+            <div class="step-item is-done">
+                <span class="step-badge">2</span>
+                <span class="step-label">Chọn ghế</span>
+                <span class="step-line"></span>
+            </div>
+            <div class="step-item is-done">
+                <span class="step-badge">3</span>
+                <span class="step-label">Thông tin</span>
+                <span class="step-line"></span>
+            </div>
+            <div class="step-item is-active">
+                <span class="step-badge">4</span>
+                <span class="step-label">Thanh toán</span>
+                <span class="step-line"></span>
+            </div>
+            <div class="step-item">
+                <span class="step-badge">5</span>
+                <span class="step-label">Hoàn tất</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nội dung chính -->
+    <div class="card">
+        <div class="badge">✕</div>
+        <h1>Thanh toán thất bại</h1>
+        <p class="sub">Rất tiếc, giao dịch của bạn chưa hoàn tất. Bạn vui lòng quay lại đặt vé !!!.</p>
+
+        <div class="info-box">
+            <div class="info-row">
+                <span class="label">Mã đơn / Mã vé:</span>
+                <strong id="orderId">—</strong>
+            </div>
+            <div class="info-row">
+                <span class="label">Mã lỗi từ VNPay:</span>
+                <strong id="errorCode">—</strong>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="index.html" class="btn secondary">Về trang chủ</a>
+        </div>
+
+        <p class="note">
+            Nếu bạn đã bị trừ tiền nhưng hệ thống chưa ghi nhận, vui lòng liên hệ Admin để được hỗ trợ đối soát.
+        </p>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        document.getElementById('orderId').textContent = params.get('orderId') || 'Không có';
+        document.getElementById('errorCode').textContent = params.get('code') || 'unknown';
+    </script>
+</body>
+
+</html>

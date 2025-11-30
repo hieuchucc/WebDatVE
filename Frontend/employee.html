@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Nhân viên | Quầy vé / Nhà xe</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --primary-dark: #0b5ed7;
+      --secondary-color: #6c757d;
+      --light-bg: #f8f9fa;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+      --transition: all 0.2s ease;
+    }
+
+    body {
+      background: linear-gradient(135deg, #edf1f5 0%, #f0f4f8 100%);
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, var(--primary-color), var(--primary-dark));
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--box-shadow);
+      transition: var(--transition);
+      position: relative;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem 1.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.05);
+    }
+
+    .sidebar-header h4 {
+      font-size: 1.2rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-weight: 600;
+    }
+
+    .sidebar-header .subtitle {
+      font-size: .85rem;
+      opacity: 0.9;
+      margin-top: 0.25rem;
+      margin-left: 2.25rem;
+    }
+
+    .sidebar-nav {
+      padding: 1rem 0.75rem 1.5rem;
+      flex: 1;
+    }
+
+    .sidebar .nav-link {
+      color: rgba(255,255,255,0.85);
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      transition: var(--transition);
+      position: relative;
+      text-decoration: none;
+    }
+
+    .sidebar .nav-link.active,
+    .sidebar .nav-link:hover {
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      transform: translateX(5px);
+    }
+
+    .sidebar .nav-link.active::before {
+      content: '';
+      position: absolute;
+      left: -0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 60%;
+      background: white;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.25rem 1.25rem;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      font-size: .9rem;
+      background: rgba(0,0,0,0.05);
+    }
+
+    .sidebar-footer .hotline {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .main {
+      flex: 1;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-x: hidden;
+    }
+
+    .topbar {
+      background: #fff;
+      border-radius: var(--border-radius);
+      padding: 1rem 1.5rem;
+      box-shadow: var(--box-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: var(--transition);
+    }
+
+    .topbar:hover {
+      box-shadow: 0 6px 16px rgba(15,23,42,0.12);
+    }
+
+    .topbar-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .topbar-title i {
+      color: var(--primary-color);
+      font-size: 1.4rem;
+    }
+
+    .badge-role {
+      background: linear-gradient(135deg, rgba(25,135,84,0.1), rgba(25,135,84,0.15));
+      color: #198754;
+      border-radius: 999px;
+      padding: .25rem .75rem;
+      font-size: .8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      border: 1px solid rgba(25,135,84,0.2);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 1.5rem;
+    }
+
+    .card {
+      border: none;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      transition: var(--transition);
+      overflow: hidden;
+    }
+
+    .card:hover {
+      box-shadow: 0 6px 16px rgba(15,23,42,0.12);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      background: #fff;
+      border-bottom: 1px solid rgba(148,163,184,.25);
+      border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+      padding: 1rem 1.25rem;
+    }
+
+    .card-header h6 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #1e293b;
+    }
+
+    .card-body {
+      padding: 1rem 1.25rem 1.25rem;
+      font-size: .9rem;
+    }
+
+    .table thead th {
+      background: var(--light-bg);
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      font-weight: 600;
+      color: #475569;
+      padding: 0.75rem 0.75rem;
+    }
+
+    .table tbody td {
+      vertical-align: middle;
+      font-size: .87rem;
+      padding: 0.75rem 0.75rem;
+    }
+
+    .trip-row {
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .trip-row:hover {
+      background: #f1f5f9 !important;
+      transform: scale(1.01);
+    }
+
+    .status-pill {
+      border-radius: 999px;
+      padding: .25rem .75rem;
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-pill.pending { background:#fff3cd; color:#8a6d3b; border: 1px solid rgba(138, 109, 59, 0.2); }
+    .status-pill.confirmed { background:#d1e7dd; color:#0f5132; border: 1px solid rgba(15, 81, 50, 0.2); }
+    .status-pill.completed { background:#cfe2ff; color:#084298; border: 1px solid rgba(8, 66, 152, 0.2); }
+    .status-pill.cancelled { background:#f8d7da; color:#842029; border: 1px solid rgba(132, 32, 41, 0.2); }
+
+    .status-pill.transfer-waiting { background:#fff3cd; color:#8a6d3b; border: 1px solid rgba(138,109,59,0.25); }
+    .status-pill.transfer-picking { background:#cff4fc; color:#055160; border: 1px solid rgba(5,81,96,0.25); }
+    .status-pill.transfer-picked  { background:#d1e7dd; color:#0f5132; border: 1px solid rgba(15,81,50,0.25); }
+    .status-pill.transfer-dropped { background:#e2e3e5; color:#41464b; border: 1px solid rgba(65,70,75,0.25); }
+
+    .muted {
+      color: #64748b;
+      font-size: .85rem;
+    }
+
+    .btn {
+      border-radius: 8px;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.825rem;
+    }
+
+    .btn-outline-primary {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      border: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+    }
+
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      transition: var(--transition);
+    }
+
+    .form-control:focus, .form-select:focus {
+      box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+      border-color: var(--primary-color);
+    }
+
+    .table-responsive {
+      border-radius: 8px;
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .badge {
+      font-weight: 500;
+      padding: 0.35em 0.65em;
+    }
+
+    .stats-card {
+      background: linear-gradient(135deg, #fff, #f8fafc);
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .stats-card .number {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .stats-card .label {
+      font-size: 0.85rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 1200px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .layout { flex-direction: column; }
+      .sidebar { 
+        width: 100%; 
+        flex-direction: row; 
+        align-items: center;
+        padding: 0.75rem 1rem;
+      }
+      .sidebar-header {
+        padding: 0;
+        border-bottom: none;
+        flex: 1;
+      }
+      .sidebar-nav { 
+        display: none; 
+      }
+      .sidebar-footer { 
+        display: none; 
+      }
+      .main { 
+        padding: 1rem; 
+      }
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      
+      .topbar > div:first-child {
+        width: 100%;
+      }
+      
+      .topbar > div:last-child {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      
+      .card-header .d-flex {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h4>
+        <i class="bi bi-headset"></i>
+        Bảng điều khiển nhân viên
+      </h4>
+      <div class="subtitle">Quầy vé / Điều hành nhà xe</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="employee.html" class="nav-link active">
+        <i class="bi bi-calendar-week"></i>
+        Lịch chạy hôm nay
+      </a>
+      <a href="index.html" class="nav-link">
+        <i class="bi bi-house-door"></i>
+        Về trang khách
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="small">Hotline hỗ trợ</div>
+      <div class="hotline">0123 456 789</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">
+          <i class="bi bi-clipboard-check"></i>
+          Ca làm việc hôm nay
+        </div>
+        <div id="todayText" class="muted"></div>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-person-circle text-primary"></i>
+          <span id="empName" class="fw-semibold"></span>
+        </div>
+        <span class="badge-role">Nhân viên</span>
+        <button id="btnLogout" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1">
+          <i class="bi bi-box-arrow-right"></i> Đăng xuất
+        </button>
+      </div>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="row g-3 mb-2">
+      <div class="col-md-3">
+        <div class="card stats-card">
+          <div class="card-body py-3">
+            <div class="number" id="totalTrips">0</div>
+            <div class="label">Tổng chuyến</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card">
+          <div class="card-body py-3">
+            <div class="number" id="totalBookings">0</div>
+            <div class="label">Tổng vé</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card">
+          <div class="card-body py-3">
+            <div class="number" id="pendingBookings">0</div>
+            <div class="label">Vé chờ xử lý</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card">
+          <div class="card-body py-3">
+            <div class="number" id="confirmedBookings">0</div>
+            <div class="label">Vé đã xác nhận</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT: CHUYẾN XE & VÉ -->
+    <div class="content-grid">
+      <!-- LEFT: trips -->
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h6>Chuyến xe</h6>
+          <div class="d-flex align-items-center gap-2">
+            <input type="date" id="dateFilter" class="form-control form-control-sm" style="max-width: 160px;">
+            <button id="btnLoadTrips" class="btn btn-sm btn-primary d-flex align-items-center gap-1">
+              <i class="bi bi-arrow-repeat"></i> Tải chuyến
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="tripMsg" class="muted mb-2"></div>
+          <div class="table-responsive" style="max-height: 380px; overflow:auto;">
+            <table class="table table-sm table-hover align-middle">
+              <thead>
+              <tr>
+                <th>Mã tuyến</th>
+                <th>Ngày</th>
+                <th>Giờ</th>
+                <th>Ghế</th>
+                <th>Trạng thái</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody id="tbTrips"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: bookings of selected trip -->
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h6>Danh sách vé / khách</h6>
+          <div id="currentTripInfo" class="muted fw-medium"></div>
+        </div>
+        <div class="card-body">
+          <div id="bookingMsg" class="muted mb-2">Chọn một chuyến để xem danh sách vé.</div>
+          <div class="table-responsive" style="max-height: 380px; overflow:auto;">
+            <table class="table table-sm align-middle">
+              <thead>
+              <tr>
+                <th>Khách</th>
+                <th>Liên hệ</th>
+                <th>Ghế</th>
+                <th>Thanh toán</th>
+                <th>Trạng thái</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody id="tbBookings"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT: TRUNG CHUYỂN / ĐƯA RƯỚC -->
+    <h5 class="mt-4 mb-2 d-flex align-items-center gap-2">
+      <i class="bi bi-truck-front text-primary"></i>
+      Trung chuyển / Đưa rước
+      <span class="muted" style="font-size:0.85rem;">(dựa theo cùng ngày với lịch chạy)</span>
+    </h5>
+
+    <div class="content-grid">
+      <!-- LEFT: Shuttles -->
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h6>Danh sách xe trung chuyển</h6>
+          <button id="btnLoadShuttles" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+            <i class="bi bi-arrow-repeat"></i> Tải danh sách
+          </button>
+        </div>
+        <div class="card-body">
+          <div id="shuttleMsg" class="muted mb-2"></div>
+          <div class="table-responsive" style="max-height: 280px; overflow:auto;">
+            <table class="table table-sm table-hover align-middle">
+              <thead>
+              <tr>
+                <th>Xe</th>
+                <th>Tài xế</th>
+                <th>Tuyến</th>
+                <th>Ngày</th>
+                <th>Trạng thái</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody id="tbShuttles"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: bookings for selected shuttle -->
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h6>Khách trung chuyển của xe</h6>
+          <div id="currentShuttleInfo" class="muted fw-medium"></div>
+        </div>
+        <div class="card-body">
+          <div id="shuttleBookingMsg" class="muted mb-2">
+            Chọn một xe trung chuyển để xem danh sách khách.
+          </div>
+          <div class="table-responsive" style="max-height: 280px; overflow:auto;">
+            <table class="table table-sm align-middle">
+              <thead>
+              <tr>
+                <th>Khách</th>
+                <th>Địa chỉ đón / trả</th>
+                <th>Ghi chú</th>
+                <th>Trạng thái trung chuyển</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody id="tbShuttleBookings"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const API_BASE = 'http://127.0.0.1:3000';
+  const token = () => localStorage.getItem('token');
+  const authHeaders = () => ({
+    'Content-Type': 'application/json',
+    Authorization: 'Bearer ' + token()
+  });
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  const empNameEl = $('#empName');
+  const btnLogout = $('#btnLogout');
+  const dateFilter = $('#dateFilter');
+  const todayText = $('#todayText');
+  const tripMsg = $('#tripMsg');
+  const bookingMsg = $('#bookingMsg');
+  const tbTrips = $('#tbTrips');
+  const tbBookings = $('#tbBookings');
+  const currentTripInfo = $('#currentTripInfo');
+  const totalTripsEl = $('#totalTrips');
+  const totalBookingsEl = $('#totalBookings');
+  const pendingBookingsEl = $('#pendingBookings');
+  const confirmedBookingsEl = $('#confirmedBookings');
+
+  // Trung chuyển
+  const shuttleMsg = $('#shuttleMsg');
+  const tbShuttles = $('#tbShuttles');
+  const shuttleBookingMsg = $('#shuttleBookingMsg');
+  const tbShuttleBookings = $('#tbShuttleBookings');
+  const currentShuttleInfo = $('#currentShuttleInfo');
+
+  let currentTrip = null;
+  let currentShuttle = null;
+
+  function fmtMoney(n) {
+    return (Number(n || 0)).toLocaleString('vi-VN');
+  }
+  
+  function fmtDateLabel(d) {
+    return d.toLocaleDateString('vi-VN', {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
+
+  async function requireEmployee() {
+    const t = token();
+    if (!t) {
+      alert('Bạn chưa đăng nhập.');
+      location.href = 'login.html';
+      return;
+    }
+    try {
+      const res = await fetch(API_BASE + '/api/auth/me', {
+        headers: authHeaders(),
+        credentials: 'include'
+      });
+      if (!res.ok) throw 0;
+      const me = await res.json();
+      if (!me || me.role !== 'employee') {
+        alert('Bạn không có quyền nhân viên.');
+        location.href = 'index.html';
+        return;
+      }
+      localStorage.setItem('user', JSON.stringify(me));
+      empNameEl.textContent = me.username || me.email || 'Nhân viên';
+    } catch {
+      alert('Phiên đăng nhập đã hết, vui lòng đăng nhập lại.');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      location.href = 'login.html';
+    }
+  }
+
+  // ====== TRIPS ======
+  async function loadTrips() {
+    tripMsg.textContent = 'Đang tải danh sách chuyến...';
+    tbTrips.innerHTML = '';
+    currentTrip = null;
+    tbBookings.innerHTML = '';
+    bookingMsg.textContent = 'Chọn một chuyến để xem danh sách vé.';
+    currentTripInfo.textContent = '';
+
+    const dateStr = dateFilter.value;
+    if (!dateStr) {
+      tripMsg.textContent = 'Vui lòng chọn ngày.';
+      return;
+    }
+
+    try {
+      const res = await fetch(API_BASE + '/api/employee/trips?date=' + encodeURIComponent(dateStr), {
+        headers: authHeaders(),
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        tripMsg.textContent = data.message || 'Lỗi tải chuyến.';
+        return;
+      }
+
+      const items = data.items || data || [];
+      if (!items.length) {
+        tripMsg.textContent = 'Không có chuyến nào cho ngày này.';
+        tbTrips.innerHTML = '';
+        totalTripsEl.textContent = '0';
+        return;
+      }
+
+      tripMsg.textContent = `Có ${items.length} chuyến. Nhấn "Xem vé" để xem danh sách khách.`;
+      totalTripsEl.textContent = items.length;
+      
+      tbTrips.innerHTML = items.map(t => `
+        <tr class="trip-row" data-id="${t._id}">
+          <td class="fw-semibold">${t.routeCode}</td>
+          <td>${t.dateStr}</td>
+          <td><span class="fw-bold text-primary">${t.departHM || ''}</span></td>
+          <td>
+            <span class="fw-semibold">${(t.seatsBooked || 0)}/${t.seatsTotal || 0}</span>
+            <div class="progress mt-1" style="height: 4px;">
+              <div class="progress-bar ${t.seatsBooked/t.seatsTotal > 0.8 ? 'bg-warning' : 'bg-success'}" 
+                   style="width: ${(t.seatsBooked/t.seatsTotal)*100}%"></div>
+            </div>
+          </td>
+          <td>
+            ${t.active ? 
+              '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Đang mở</span>' : 
+              '<span class="badge bg-secondary"><i class="bi bi-lock me-1"></i>Đã khóa</span>'}
+          </td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-primary btn-view-trip d-flex align-items-center gap-1" data-id="${t._id}">
+              <i class="bi bi-people"></i> Xem vé
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      tbTrips.querySelectorAll('.btn-view-trip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          const trip = items.find(x => x._id === id);
+          if (trip) {
+            currentTrip = trip;
+            currentTripInfo.textContent =
+              `${trip.routeCode} · ${trip.dateStr} · ${trip.departHM || ''} · ${trip.seatsBooked || 0}/${trip.seatsTotal || 0} ghế`;
+            loadBookingsForTrip(trip._id);
+          }
+        });
+      });
+    } catch (e) {
+      console.error(e);
+      tripMsg.textContent = 'Không kết nối được máy chủ.';
+    }
+  }
+
+  async function loadBookingsForTrip(tripId) {
+    bookingMsg.textContent = 'Đang tải danh sách vé...';
+    tbBookings.innerHTML = '';
+    try {
+      const res = await fetch(API_BASE + '/api/employee/trips/' + tripId + '/bookings', {
+        headers: authHeaders(),
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        bookingMsg.textContent = data.message || 'Lỗi tải booking.';
+        return;
+      }
+      const items = data.items || data || [];
+      if (!items.length) {
+        bookingMsg.textContent = 'Chưa có vé nào cho chuyến này.';
+        tbBookings.innerHTML = '';
+        updateBookingStats(items);
+        return;
+      }
+
+      bookingMsg.textContent = `Có ${items.length} vé.`;
+      updateBookingStats(items);
+      
+      tbBookings.innerHTML = items.map(b => `
+        <tr data-id="${b._id}">
+          <td>
+            <div class="fw-semibold">${b.customer?.name || 'Khách hàng'}</div>
+          </td>
+          <td>
+            <div>${b.customer?.phone || 'Chưa có'}</div>
+            <div class="muted">${b.customer?.email || ''}</div>
+          </td>
+          <td>
+            <span class="fw-semibold badge bg-light text-dark">${(b.seatCodes || []).join(', ')}</span>
+          </td>
+          <td>
+            <div class="text-capitalize">${b.payment?.method || 'Chưa xác định'}</div>
+            <div class="muted">${b.payment?.status || ''} · ${fmtMoney(b.payment?.amount || 0)}đ</div>
+          </td>
+          <td>
+            <span class="status-pill ${b.status}">
+              ${b.status}
+            </span>
+          </td>
+          <td class="text-end">
+            <div class="d-flex align-items-center gap-1">
+              <select class="form-select form-select-sm sel-status" style="max-width:120px;">
+                <option value="pending"   ${b.status==='pending'?'selected':''}>Chờ xử lý</option>
+                <option value="confirmed" ${b.status==='confirmed'?'selected':''}>Đã xác nhận</option>
+                <option value="completed" ${b.status==='completed'?'selected':''}>Hoàn thành</option>
+                <option value="cancelled" ${b.status==='cancelled'?'selected':''}>Đã hủy</option>
+              </select>
+              <button class="btn btn-sm btn-outline-success btn-update-status">
+                <i class="bi bi-check2"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      tbBookings.querySelectorAll('.btn-update-status').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const tr = btn.closest('tr');
+          const id = tr.getAttribute('data-id');
+          const sel = tr.querySelector('.sel-status');
+          const newStatus = sel.value;
+          await updateBookingStatus(id, newStatus);
+          if (currentTrip) {
+            loadBookingsForTrip(currentTrip._id);
+          }
+        });
+      });
+    } catch (e) {
+      console.error(e);
+      bookingMsg.textContent = 'Không kết nối được máy chủ.';
+    }
+  }
+
+  function updateBookingStats(bookings) {
+    totalBookingsEl.textContent = bookings.length;
+    pendingBookingsEl.textContent = bookings.filter(b => b.status === 'pending').length;
+    confirmedBookingsEl.textContent = bookings.filter(b => b.status === 'confirmed').length;
+  }
+
+  async function updateBookingStatus(id, status) {
+    try {
+      const res = await fetch(API_BASE + '/api/employee/bookings/' + id + '/status', {
+        method: 'PATCH',
+        headers: authHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({ status })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message || 'Cập nhật trạng thái thất bại.');
+        return;
+      }
+      bookingMsg.textContent = 'Đã cập nhật trạng thái.';
+    } catch (e) {
+      console.error(e);
+      alert('Không kết nối được máy chủ.');
+    }
+  }
+
+  // ====== SHUTTLES (TRUNG CHUYỂN) ======
+  async function loadShuttles() {
+    shuttleMsg.textContent = 'Đang tải danh sách xe trung chuyển...';
+    tbShuttles.innerHTML = '';
+    currentShuttle = null;
+    tbShuttleBookings.innerHTML = '';
+    shuttleBookingMsg.textContent = 'Chọn một xe trung chuyển để xem danh sách khách.';
+    currentShuttleInfo.textContent = '';
+
+    const dateStr = dateFilter.value;
+    if (!dateStr) {
+      shuttleMsg.textContent = 'Vui lòng chọn ngày (cùng với lịch chạy ở trên).';
+      return;
+    }
+
+    try {
+      const res = await fetch(API_BASE + '/api/shuttles?date=' + encodeURIComponent(dateStr), {
+        headers: authHeaders(),
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        shuttleMsg.textContent = data.message || 'Lỗi tải shuttle.';
+        return;
+      }
+
+      const items = Array.isArray(data) ? data : (data.items || []);
+      if (!items.length) {
+        shuttleMsg.textContent = 'Chưa có xe trung chuyển nào cho ngày này.';
+        tbShuttles.innerHTML = '';
+        return;
+      }
+
+      shuttleMsg.textContent = `Có ${items.length} xe trung chuyển. Nhấn "Xem khách" để xem danh sách.`;
+
+      tbShuttles.innerHTML = items.map(s => `
+        <tr data-id="${s._id}">
+          <td>
+            <div class="fw-semibold">${s.plateNumber}</div>
+          </td>
+          <td>
+            <div class="fw-semibold">${s.driverName}</div>
+            <div class="muted">${s.driverPhone}</div>
+          </td>
+          <td>${s.mainRouteCode || '-'}</td>
+          <td>${s.workingDateStr || ''}</td>
+          <td>
+            ${
+              s.status === 'on_route'
+                ? '<span class="badge bg-info text-dark">Đang đi đón</span>'
+                : s.status === 'idle'
+                  ? '<span class="badge bg-success">Rảnh</span>'
+                  : '<span class="badge bg-secondary">Tạm nghỉ</span>'
+            }
+          </td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-primary btn-view-shuttle" data-id="${s._id}">
+              <i class="bi bi-people"></i> Xem khách
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      tbShuttles.querySelectorAll('.btn-view-shuttle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          const shuttle = items.find(x => x._id === id);
+          if (shuttle) {
+            currentShuttle = shuttle;
+            currentShuttleInfo.textContent =
+              `${shuttle.plateNumber} · ${shuttle.driverName} · ${shuttle.workingDateStr || ''}`;
+            loadShuttleBookings(shuttle._id);
+          }
+        });
+      });
+    } catch (e) {
+      console.error(e);
+      shuttleMsg.textContent = 'Không kết nối được máy chủ.';
+    }
+  }
+
+  async function loadShuttleBookings(shuttleId) {
+    shuttleBookingMsg.textContent = 'Đang tải danh sách khách trung chuyển...';
+    tbShuttleBookings.innerHTML = '';
+
+    try {
+      const res = await fetch(API_BASE + '/api/shuttles/' + shuttleId + '/bookings', {
+        headers: authHeaders(),
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        shuttleBookingMsg.textContent = data.message || 'Lỗi tải danh sách khách trung chuyển.';
+        return;
+      }
+
+      const items = data.items || data || [];
+      if (!items.length) {
+        shuttleBookingMsg.textContent = 'Chưa có khách gán cho xe này.';
+        tbShuttleBookings.innerHTML = '';
+        return;
+      }
+
+      shuttleBookingMsg.textContent = `Có ${items.length} khách.`;
+
+      tbShuttleBookings.innerHTML = items.map(b => {
+        const c = b.customer || {};
+        const transferStatus = b.transferStatus || 'waiting';
+        const transferClass =
+          transferStatus === 'picking' ? 'transfer-picking' :
+          transferStatus === 'picked'  ? 'transfer-picked'  :
+          transferStatus === 'dropped' ? 'transfer-dropped' :
+                                         'transfer-waiting';
+
+        return `
+        <tr data-id="${b._id}">
+          <td>
+            <div class="fw-semibold">${c.name || 'Khách hàng'}</div>
+            <div class="muted">${c.phone || ''}</div>
+          </td>
+          <td>
+            <div><strong>Đón:</strong> ${c.pickupAddress || c.pickupPoint || '-'}</div>
+            <div><strong>Trả:</strong> ${c.dropoffAddress || c.dropoffPoint || '-'}</div>
+          </td>
+          <td>
+            <div class="muted">${c.transferTimeNote || ''}</div>
+          </td>
+          <td>
+            <span class="status-pill ${transferClass}">
+              ${
+                transferStatus === 'picking' ? 'Đang đi đón' :
+                transferStatus === 'picked'  ? 'Đã đón'      :
+                transferStatus === 'dropped' ? 'Đã trả'      :
+                                               'Chờ đón'
+              }
+            </span>
+          </td>
+          <td class="text-end">
+            <div class="d-flex align-items-center gap-1">
+              <select class="form-select form-select-sm sel-transfer" style="max-width:145px;">
+                <option value="waiting"  ${transferStatus==='waiting'?'selected':''}>Chờ đón</option>
+                <option value="picking"  ${transferStatus==='picking'?'selected':''}>Đang đi đón</option>
+                <option value="picked"   ${transferStatus==='picked'?'selected':''}>Đã đón</option>
+                <option value="dropped"  ${transferStatus==='dropped'?'selected':''}>Đã trả khách</option>
+              </select>
+              <button class="btn btn-sm btn-outline-success btn-update-transfer">
+                <i class="bi bi-check2"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        `;
+      }).join('');
+
+      tbShuttleBookings.querySelectorAll('.btn-update-transfer').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const tr = btn.closest('tr');
+          const id = tr.getAttribute('data-id');
+          const sel = tr.querySelector('.sel-transfer');
+          const newStatus = sel.value;
+          await updateTransferStatus(id, newStatus);
+          if (currentShuttle) {
+            loadShuttleBookings(currentShuttle._id);
+          }
+        });
+      });
+    } catch (e) {
+      console.error(e);
+      shuttleBookingMsg.textContent = 'Không kết nối được máy chủ.';
+    }
+  }
+
+  async function updateTransferStatus(bookingId, transferStatus) {
+    try {
+      const res = await fetch(API_BASE + '/api/shuttles/bookings/' + bookingId + '/transfer-status', {
+        method: 'PATCH',
+        headers: authHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({ transferStatus })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message || 'Cập nhật trạng thái trung chuyển thất bại.');
+        return;
+      }
+      shuttleBookingMsg.textContent = 'Đã cập nhật trạng thái trung chuyển.';
+    } catch (e) {
+      console.error(e);
+      alert('Không kết nối được máy chủ.');
+    }
+  }
+
+  // ====== INIT ======
+  document.addEventListener('DOMContentLoaded', async () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth()+1).padStart(2,'0');
+    const dd = String(today.getDate()).padStart(2,'0');
+    dateFilter.value = `${yyyy}-${mm}-${dd}`;
+    todayText.textContent = fmtDateLabel(today);
+
+    await requireEmployee();
+    await loadTrips();
+    await loadShuttles();
+  });
+
+  $('#btnLoadTrips').addEventListener('click', async () => {
+    await loadTrips();
+    await loadShuttles(); // cùng thay đổi theo ngày
+  });
+
+  $('#btnLoadShuttles').addEventListener('click', loadShuttles);
+
+  btnLogout.addEventListener('click', async () => {
+    try {
+      await fetch(API_BASE + '/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      }).catch(() => {});
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      location.href = 'login.html';
+    }
+  });
+</script>
+</body>
+</html>

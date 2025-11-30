@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nhập thông tin & Thanh toán</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* =========================
+        Checkout — Du Lịch Ba Duy
+        Bản làm lại, hiện đại, thoáng
+    ========================== */
+        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+         :root {
+            --primary: #0A5AD7;
+            --primary-600: #0C63E7;
+            --primary-700: #0847A5;
+            --primary-soft: rgba(10, 90, 215, 0.08);
+            --accent: #FFD03B;
+            --accent-soft: rgba(255, 208, 59, 0.12);
+            --bg: #F3F5FB;
+            --card: #FFFFFF;
+            --text: #0F172A;
+            --text-soft: #4B5563;
+            --muted: #94A3B8;
+            --border: #E2E8F0;
+            --danger: #EF4444;
+            --success: #16A34A;
+            --radius-lg: 18px;
+            --shadow: 0 10px 40px rgba(15, 23, 42, .08);
+            --focus-ring: 0 0 0 3px rgba(10, 90, 215, .25);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(900px 500px at 10% -10%, rgba(10, 90, 215, .09), transparent 50%), radial-gradient(900px 500px at 110% 20%, rgba(255, 208, 59, .05), transparent 55%), var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        /* ===== Header ===== */
+        
+        .fw-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: saturate(180%) blur(18px);
+            background: linear-gradient(120deg, rgba(10, 90, 215, .98) 0%, rgba(7, 73, 167, .98) 42%, rgba(13, 65, 131, .95) 100%);
+            box-shadow: 0 10px 38px rgba(15, 23, 42, 0.08);
+        }
+        
+        .fw-header__inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            text-decoration: none;
+        }
+        
+        .brand__logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: #fff;
+            object-fit: cover;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .1);
+        }
+        
+        .brand__title {
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: -.015em;
+            font-size: 1.1rem;
+        }
+        
+        .hotline-btn {
+            background: #fff !important;
+            border: 1px solid rgba(255, 255, 255, .15);
+            border-radius: 999px;
+            font-weight: 600;
+            display: flex;
+            gap: .5rem;
+            align-items: center;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, .08);
+            color: var(--text);
+        }
+        
+        .hotline-menu {
+            min-width: 280px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+        /* ===== Page layout ===== */
+        
+        .page {
+            max-width: 1200px;
+            margin: 14px auto 60px;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 330px;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+        /* ===== Intro ===== */
+        
+        .checkout-intro {
+            grid-column: 1 / -1;
+            margin-top: .6rem;
+        }
+        
+        .intro-header-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: .5rem;
+        }
+        
+        .intro-row {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            flex-wrap: wrap;
+            margin-bottom: .25rem;
+        }
+        
+        .intro-back {
+            background: rgba(255, 255, 255, .25);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(10, 90, 215, .25);
+            padding: .35rem .8rem;
+            border-radius: 999px;
+            display: inline-flex;
+            gap: .4rem;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            transition: .15s;
+        }
+        
+        .intro-back:hover {
+            background: #fff;
+        }
+        
+        .intro-title {
+            font-weight: 800;
+            font-size: clamp(1.55rem, 2.4vw, 1.9rem);
+            letter-spacing: -.015em;
+            margin-bottom: .1rem;
+        }
+        
+        .intro-sub {
+            color: var(--muted);
+            margin-bottom: .35rem;
+        }
+        /* ===== 5-step bar ===== */
+        
+        .checkout-steps {
+            display: flex;
+            gap: .4rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            white-space: nowrap;
+        }
+        
+        .step-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            border: 2px solid rgba(15, 23, 42, .08);
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .75rem;
+            font-weight: 700;
+            color: var(--muted);
+        }
+        
+        .step-label {
+            font-size: .75rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+        
+        .step-line {
+            width: 36px;
+            height: 2px;
+            background: rgba(148, 163, 184, .35);
+        }
+        
+        .step-item.is-active .step-badge {
+            background: var(--primary);
+            border-color: rgba(10, 90, 215, .1);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(10, 90, 215, .4);
+        }
+        
+        .step-item.is-active .step-label {
+            color: var(--text);
+            font-weight: 600;
+        }
+        
+        .step-item.is-done .step-badge {
+            background: rgba(22, 163, 74, .15);
+            border-color: rgba(22, 163, 74, .12);
+            color: #166534;
+        }
+        
+        .step-item.is-done .step-label {
+            color: #166534;
+            font-weight: 500;
+        }
+        /* ===== expired banner ===== */
+        
+        .hold-expired-banner {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
+            border-radius: .9rem;
+            padding: .55rem .75rem;
+            font-size: .78rem;
+            display: none;
+            gap: .4rem;
+            align-items: center;
+            margin-top: .45rem;
+        }
+        
+        .hold-expired-banner.show {
+            display: flex;
+        }
+        /* ===== Cards ===== */
+        
+        .card-clean {
+            background: var(--card);
+            border: 1px solid rgba(226, 232, 240, .7);
+            border-radius: 1.1rem;
+            box-shadow: 0 20px 40px rgba(148, 163, 184, .08);
+            transition: .15s;
+        }
+        
+        .card-clean:hover {
+            border-color: rgba(10, 90, 215, .25);
+        }
+        
+        .card-body {
+            padding: 1.25rem 1.25rem 1.25rem;
+        }
+        /* ===== Hold summary (main top card) ===== */
+        
+        .hold-title-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .badge-hold {
+            background: linear-gradient(180deg, #0A5AD7 0%, #0847A5 100%);
+            border: 1px solid rgba(255, 255, 255, .2);
+            border-radius: 999px;
+            color: #fff;
+            font-weight: 700;
+            padding: .35rem .6rem;
+            font-size: .7rem;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+        
+        .hold-txt {
+            font-size: .78rem;
+            color: var(--muted);
+        }
+        
+        .countdown {
+            background: #FFF4E5;
+            border: 1px dashed rgba(245, 158, 11, .48);
+            color: #8B5E00;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            border-radius: 12px;
+            padding: .2rem .65rem;
+            font-size: 1.1rem;
+            line-height: 1.3;
+            min-width: 76px;
+            text-align: center;
+        }
+        
+        .line-muted {
+            border-top: 1px dashed rgba(226, 232, 240, .85);
+            margin: 14px 0 15px;
+        }
+        
+        .label-sm {
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: var(--muted);
+            margin-bottom: 3px;
+            font-weight: 600;
+        }
+        
+        .seat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            background: rgba(10, 90, 215, .06);
+            border: 1px solid rgba(10, 90, 215, .15);
+            color: var(--text);
+            border-radius: 999px;
+            padding: .25rem .6rem;
+            font-weight: 600;
+            margin-right: .25rem;
+            margin-bottom: .25rem;
+        }
+        /* ===== Right column summary ===== */
+        
+        .summary-panel {
+            position: sticky;
+            top: 68px;
+        }
+        
+        .summary-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: .5rem;
+        }
+        
+        .summary-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+        
+        .price-total {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #B91C1C;
+        }
+        
+        .badge-soft {
+            background: rgba(10, 90, 215, .08);
+            border: 1px solid rgba(10, 90, 215, .05);
+            border-radius: 99px;
+            padding: .3rem .65rem;
+            font-weight: 500;
+            color: var(--text-soft);
+            font-size: .74rem;
+        }
+        /* ===== Form ===== */
+        
+        .section-title {
+            font-weight: 700;
+            font-size: 1.02rem;
+            margin-bottom: .6rem;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+        
+        .section-title small {
+            color: var(--muted);
+            font-weight: 500;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: .35rem;
+        }
+        
+        .form-control,
+        .form-select {
+            border-radius: .8rem;
+            border: 1px solid rgba(226, 232, 240, .9);
+            height: 46px;
+            background: rgba(255, 255, 255, .8);
+            transition: .1s;
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+            border-color: rgba(10, 90, 215, .5);
+            box-shadow: var(--focus-ring);
+            background: #fff;
+        }
+        
+        .form-check-input {
+            width: 1.05rem;
+            height: 1.05rem;
+            border-radius: .4rem;
+            border: 1px solid #CBD5E1;
+        }
+        
+        .form-check-input:checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(180deg, #0A5AD7 0%, #0847A5 100%);
+            border: none;
+            border-radius: 999px;
+            font-weight: 700;
+            padding: .65rem 1.4rem;
+            box-shadow: 0 12px 26px rgba(10, 90, 215, .3);
+        }
+        
+        .btn-outline-danger {
+            border-radius: 999px;
+            font-weight: 600;
+        }
+        
+        .small-muted {
+            font-size: .78rem;
+            color: var(--muted);
+        }
+        /* ===== Result card ===== */
+        
+        #cardResult .badge {
+            border-radius: .6rem;
+        }
+        /* ===== Responsive ===== */
+        
+        @media (max-width: 991px) {
+            .page {
+                grid-template-columns: 1fr;
+            }
+            .summary-panel {
+                position: static;
+            }
+            .intro-header-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .checkout-steps {
+                order: 2;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .fw-header__inner {
+                gap: .5rem;
+            }
+            .brand__title {
+                display: none;
+            }
+            .card-body {
+                padding: 1rem .95rem 1rem;
+            }
+            .checkout-steps {
+                gap: .25rem;
+            }
+            .step-label {
+                display: none;
+            }
+            .intro-title {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="fw-header">
+        <div class="fw-header__inner">
+            <a href="index.html" class="brand">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdk1KSWlpLDRMeHJM6uZpOhHTWgzEzgDuU6ZKf1go82QKatnJwwUWcGVz3nC1JHMUHa34&usqp=CAU" class="brand__logo">
+                <span class="brand__title">Du Lịch Ba Duy</span>
+            </a>
+
+            <div class="dropdown">
+                <button class="btn btn-light hotline-btn" id="hotlineDropdown" data-bs-toggle="dropdown">
+        <img src="https://cdn-icons-png.freepik.com/512/3488/3488550.png" width="28" height="28"
+             class="rounded-circle bg-white p-1 shadow-sm hotline-icon">
+        Hotline 24/7
+      </button>
+
+                <ul class="dropdown-menu p-3 dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="tel:0123456789">
+                            <div class="fw-bold">0123456789</div>
+                            <small class="text-muted">Phản hồi dịch vụ & sự cố</small>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="tel:0987654321">
+                            <div class="fw-bold">0987654321</div>
+                            <small class="text-muted">Đặt vé qua điện thoại</small>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================= INTRO ========================= -->
+    <section class="checkout-intro py-3">
+        <div class="container">
+
+            <div class="intro-header-row d-flex justify-content-between align-items-center flex-wrap">
+                <a href="index.html" class="intro-back">← Trang chủ</a>
+
+                <div class="checkout-steps" id="checkoutSteps">
+                    <div class="step-item is-done">
+                        <span class="step-badge">1</span>
+                        <span class="step-label">Chọn chuyến</span>
+                        <span class="step-line"></span>
+                    </div>
+
+                    <div class="step-item is-done">
+                        <span class="step-badge">2</span>
+                        <span class="step-label">Chọn ghế</span>
+                        <span class="step-line"></span>
+                    </div>
+
+                    <div class="step-item is-active" data-step="3">
+                        <span class="step-badge">3</span>
+                        <span class="step-label">Thông tin</span>
+                        <span class="step-line"></span>
+                    </div>
+
+                    <div class="step-item" data-step="4">
+                        <span class="step-badge">4</span>
+                        <span class="step-label">Thanh toán</span>
+                        <span class="step-line"></span>
+                    </div>
+
+                    <div class="step-item" data-step="5">
+                        <span class="step-badge">5</span>
+                        <span class="step-label">Hoàn tất</span>
+                    </div>
+                </div>
+            </div>
+
+            <h1 class="intro-title mt-3 text-center">
+                Xác nhận thông tin giữ chỗ & Thanh toán
+            </h1>
+
+            <div id="holdExpiredMsg" class="hold-expired-banner">
+                <strong>⏰ Hết thời gian giữ chỗ.</strong>
+                <span>Vui lòng quay lại để chọn ghế.</span>
+                <a href="index.html" class="ms-auto text-decoration-underline small">Quay lại</a>
+            </div>
+
+        </div>
+    </section>
+
+    <main class="page">
+
+        <!-- LEFT COLUMN -->
+        <div class="left-col d-flex flex-column gap-3">
+
+            <!-- ========================= THÔNG TIN GIỮ CHỖ ========================= -->
+            <div class="card-clean" id="cardHold">
+                <div class="card-body">
+
+                    <div class="hold-title-line d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="d-flex gap-2 align-items-center mb-1">
+                                <span class="badge-hold">Giữ chỗ</span>
+                                <span id="holdId" class="text-muted small mono"></span>
+                            </div>
+                            <div id="routeText" class="fw-bold fs-5 mb-1"></div>
+                            <div id="departText" class="hold-txt"></div>
+                        </div>
+
+                        <div class="text-end">
+                            <div class="small text-muted mb-1">Còn lại</div>
+                            <div class="countdown fs-4 fw-bold text-danger" id="leftTime">--:--</div>
+                        </div>
+                    </div>
+
+                    <hr class="line-muted">
+
+                    <div class="row g-3">
+                        <div class="col-md-4 col-sm-6">
+                            <div class="label-sm">Ghế</div>
+                            <div id="seatList"></div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-6">
+                            <div class="label-sm">Đơn giá</div>
+                            <div id="priceEach" class="fw-semibold text-secondary"></div>
+                        </div>
+
+                        <div class="col-md-4 text-md-end">
+                            <div class="label-sm">Tổng tiền</div>
+                            <div id="totalAmount" class="fw-bold fs-5 text-danger"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ========================= FORM KHÁCH HÀNG ========================= -->
+            <div class="card-clean">
+                <div class="card-body">
+                    <div class="section-title">
+                        Thông tin khách hàng
+                        <small>(Thông tin này sẽ hiển thị trên vé)</small>
+                    </div>
+
+                    <form id="customerForm" class="row g-3 mt-1" novalidate>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Họ và tên</label>
+                            <input id="name" class="form-control" required placeholder="Nguyễn Văn A">
+                            <div class="invalid-feedback">Vui lòng nhập họ và tên.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Số điện thoại</label>
+                            <input id="phone" class="form-control" required pattern="^[0-9]{9,11}$" placeholder="09x...">
+                            <div class="invalid-feedback">Số điện thoại không hợp lệ.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email (tuỳ chọn)</label>
+                            <input id="email" type="email" class="form-control" placeholder="you@email.com">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Ghi chú (tuỳ chọn)</label>
+                            <input id="note" class="form-control" placeholder="Ví dụ: Có trẻ em, hành lý cồng kềnh...">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Điểm đón</label>
+                            <input id="pickupPoint" class="form-control" list="pickupList" required placeholder="Chọn điểm đón">
+                            <datalist id="pickupList"></datalist>
+                            <div class="invalid-feedback">Vui lòng chọn điểm đón.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Điểm trả</label>
+                            <input id="dropoffPoint" class="form-control" list="dropoffList" required placeholder="Chọn điểm trả">
+                            <datalist id="dropoffList"></datalist>
+                            <div class="invalid-feedback">Vui lòng chọn điểm trả.</div>
+                        </div>
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Xe trung chuyển (đưa rước tận nơi)</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Nhu cầu trung chuyển</label>
+                                    <select id="transferOption" class="form-select">
+        <option value="none">Không cần trung chuyển</option>
+        <option value="pickup">Đón tận nơi</option>
+        <option value="dropoff">Trả tận nơi</option>
+        <option value="both">Đón & trả tận nơi</option>
+      </select>
+                                    <div class="form-text">
+                                        Dịch vụ có thể thu thêm phụ phí tùy khu vực. Nhân viên sẽ liên hệ xác nhận.
+                                    </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+          Địa chỉ đón tận nơi
+        </label>
+                                        <div class="input-group">
+                                            <input id="pickupAddress" class="form-control" placeholder="Ví dụ: 12 Nguyễn Huệ, Lagi..." />
+                                            <button class="btn btn-outline-primary" type="button" id="btnUseCurrentLocation">
+            Lấy vị trí của tôi
+          </button>
+                                        </div>
+                                        <div class="form-text">
+                                            Bấm “Lấy vị trí của tôi” để hệ thống dùng định vị GPS (trên điện thoại bật cho trình duyệt).
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+          Địa chỉ trả khách (nếu có)
+        </label>
+                                        <input id="dropoffAddress" class="form-control" placeholder="Ví dụ: 45 Lê Lợi, Q.1, TP.HCM..." />
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <label class="form-label fw-semibold">Ghi chú giờ giấc trung chuyển</label>
+                                    <textarea id="transferTimeNote" class="form-control" rows="2" placeholder="Ví dụ: Đón trước giờ xe chạy 30 phút, có người lớn tuổi cần hỗ trợ..."></textarea>
+                                </div>
+
+                                <!-- Xem nhanh vị trí trên bản đồ -->
+                                <div class="mt-3" id="mapWrapper" style="display:none;">
+                                    <label class="form-label fw-semibold">Bản đồ vị trí đón (tham khảo)</label>
+                                    <div class="ratio ratio-16x9">
+                                        <iframe id="mapPreview" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phương thức thanh toán</label>
+                            <select id="paymentMethod" class="form-select" required>
+              <option value="">Chọn phương thức</option>
+              <option value="cod">Thanh toán khi lên xe / tại văn phòng</option>
+              <option value="vnpay">VNPay</option>
+              <option value="momo">Ví MoMo</option>
+            </select>
+                            <div class="invalid-feedback">Vui lòng chọn phương thức thanh toán.</div>
+                        </div>
+
+                        <div class="col-12 form-check ms-1">
+                            <input class="form-check-input" type="checkbox" id="agree" required>
+                            <label class="form-check-label" for="agree">
+              Tôi đồng ý với điều khoản & chính sách hoàn huỷ.
+            </label>
+                            <div class="invalid-feedback">Bạn cần đồng ý điều khoản trước khi tiếp tục.</div>
+                        </div>
+
+                        <div class="col-12 d-flex gap-2 flex-wrap">
+                            <button id="btnConfirm" class="btn btn-primary" type="submit">
+              Xác nhận đặt vé
+            </button>
+
+                            <button id="btnCancel" class="btn btn-outline-danger" type="button">
+              Huỷ giữ chỗ
+            </button>
+                        </div>
+
+                        <div id="formMsg" class="small-muted mt-1" aria-live="polite"></div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- ========================= KẾT QUẢ ========================= -->
+            <div class="card-clean d-none" id="cardResult">
+                <div class="card-body">
+                    <h2 class="section-title mb-2">Kết quả đặt vé</h2>
+                    <div id="resultText" class="mt-2"></div>
+                    <a href="index.html" class="btn btn-link ps-0 mt-3">
+          ← Về Trang chủ
+        </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ========================= RIGHT SUMMARY ========================= -->
+        <aside class="summary-panel">
+            <div class="card-clean mb-3">
+                <div class="card-body">
+
+                    <div class="summary-head d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="summary-title">Tóm tắt đơn</div>
+                            <div class="small-muted">Bạn đang giữ chỗ tạm thời</div>
+                        </div>
+                        <span class="badge-soft" id="summaryRoute">--</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-3 mb-2">
+                        <span class="text-secondary">Tuyến</span>
+                        <span id="summaryDepart" class="fw-semibold">--</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Ghế</span>
+                        <span id="summarySeats" class="fw-semibold">--</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Đơn giá</span>
+                        <span id="summaryPriceEach" class="fw-semibold">--</span>
+                    </div>
+
+                    <hr class="line-muted">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold text-secondary">Tổng thanh toán</span>
+                        <span class="price-total" id="summaryTotal">--</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card-clean">
+                <div class="card-body">
+                    <div class="fw-semibold mb-1">Lưu ý</div>
+                    <ul class="small-muted ps-3 mb-0">
+                        <li>Vé chỉ giữ trong thời gian đếm ngược.</li>
+                        <li>Nếu hết thời gian, vui lòng quay lại chọn ghế.</li>
+                        <li>Thanh toán VNPay sẽ tự động chuyển hướng.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </aside>
+
+    </main>
+
+    <!-- ========================= LOGIN MODAL ========================= -->
+    <div class="modal fade modal-login" id="modalLoginRequired" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Bạn chưa đăng nhập</h5>
+                </div>
+
+                <div class="modal-body">
+                    <p>Đăng nhập để tự động điền thông tin, theo dõi vé đã đặt và hưởng nhiều tiện ích.</p>
+                    <a href="login.html" class="btn btn-primary w-100">Đăng nhập ngay</a>
+                    <div class="text-center small mt-2">
+                        Hoặc <a href="register.html">đăng ký tài khoản mới</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        /* ===========================================================
+                                                                                   CẤU HÌNH API + ROUTE + ĐIỂM ĐÓN/TRẢ
+                                                                                =========================================================== */
+        const API_BASE = 'http://localhost:3000/api';
+
+        const ROUTE_LABEL = {
+            'LAGI-HCM': 'Lagi - TP. Hồ Chí Minh',
+            'HCM-LAGI': 'TP. Hồ Chí Minh - Lagi',
+            'LAGI-DALAT': 'Lagi - Đà Lạt',
+            'DALAT-LAGI': 'Đà Lạt - Lagi',
+            'LAGI-NTRANG': 'Lagi - Nha Trang',
+            'NTRANG-LAGI': 'Nha Trang - Lagi'
+        };
+
+        const PICKUP_POINTS = {
+            'LAGI-HCM': ['Bến xe Lagi', 'Vòng xoay Lagi', 'QL55 - Ngã 3 Tân Hải'],
+            'LAGI-DALAT': ['Bến xe Lagi', 'Cổng chợ Lagi', 'QL55 - Ngã 3 Hòa Minh'],
+            'LAGI-NTRANG': ['Bến xe Lagi', 'Cầu Đa Tro', 'QL1A - Ngã 3 Tân Nghĩa']
+        };
+
+        const DROPOFF_POINTS = {
+            'LAGI-HCM': ['BX Miền Đông Mới', 'Thủ Đức - Xa Lộ Hà Nội', 'Q1 - Bến Thành'],
+            'LAGI-DALAT': ['BX Liên Tỉnh Đà Lạt', 'Chợ Đà Lạt', 'Bùi Thị Xuân'],
+            'LAGI-NTRANG': ['BX Phía Nam Nha Trang', 'Tháp Bà', 'Trần Phú - Trung tâm']
+        };
+
+        // Tự mirror chiều ngược lại
+        (function mirror() {
+            const pairs = [
+                ['LAGI-HCM', 'HCM-LAGI'],
+                ['LAGI-DALAT', 'DALAT-LAGI'],
+                ['LAGI-NTRANG', 'NTRANG-LAGI']
+            ];
+            pairs.forEach(([go, back]) => {
+                if (!PICKUP_POINTS[back]) PICKUP_POINTS[back] = DROPOFF_POINTS[go];
+                if (!DROPOFF_POINTS[back]) DROPOFF_POINTS[back] = PICKUP_POINTS[go];
+            });
+        })();
+
+
+        /* ===========================================================
+           TIỆN ÍCH CHUNG
+        =========================================================== */
+        const byId = id => document.getElementById(id);
+        const fmtVND = n => new Intl.NumberFormat('vi-VN').format(n) + 'đ';
+
+        function getQuery(name) {
+            return new URLSearchParams(window.location.search).get(name);
+        }
+
+        function renderOptions(list, datalistEl) {
+            datalistEl.innerHTML = '';
+            (list || []).forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v;
+                datalistEl.appendChild(opt);
+            });
+        }
+
+        function setStepActive(stepNumber) {
+            const items = document.querySelectorAll('#checkoutSteps .step-item');
+            items.forEach((el, idx) => {
+                el.classList.remove('is-active', 'is-done');
+                const s = idx + 1;
+                if (s < stepNumber) el.classList.add('is-done');
+                if (s === stepNumber) el.classList.add('is-active');
+            });
+        }
+
+        /* ===========================================================
+           KIỂM TRA ĐĂNG NHẬP + TỰ ĐIỀN USER
+        =========================================================== */
+        let currentUser = null;
+
+        function loadUserInfo() {
+            try {
+                const data = localStorage.getItem("user");
+                if (!data) {
+                    currentUser = null;
+                    lockFormForGuest();
+                    return;
+                }
+
+                currentUser = JSON.parse(data);
+
+                // ⬅ TỰ ĐIỀN 
+                if (currentUser.displayName) byId("name").value = currentUser.displayName;
+                if (currentUser.phone) byId("phone").value = currentUser.phone;
+                if (currentUser.email) byId("email").value = currentUser.email;
+
+
+                // ⬅ KHOÁ LẠI
+                byId("phone").readOnly = true;
+                byId("email").readOnly = true;
+
+            } catch {
+                currentUser = null;
+                lockFormForGuest();
+            }
+        }
+
+
+        function lockFormForGuest() {
+            byId('phone').readOnly = true;
+            byId('email').readOnly = true;
+
+            // 🔥 LƯU LẠI URL HIỆN TẠI ĐỂ LOGIN XONG TRỞ VỀ
+            localStorage.setItem("redirectBack", window.location.href);
+
+            const modal = new bootstrap.Modal(byId('modalLoginRequired'));
+            modal.show();
+        }
+
+
+
+        /* ===========================================================
+           BẢO VỆ URL → KHÔNG CÓ HOLD => VỀ TRANG CHỦ
+        =========================================================== */
+        if (!getQuery('hold')) {
+            window.location.href = 'index.html';
+        }
+
+
+        /* ===========================================================
+           TẢI HOLD TỪ BACKEND
+        =========================================================== */
+        let holdCtx = null;
+        let timer = null;
+
+        async function loadHold() {
+            const holdId = getQuery('hold');
+            byId('holdId').textContent = holdId;
+
+            try {
+                const res = await fetch(`${API_BASE}/holds/${holdId}`);
+                const data = await res.json();
+
+                if (!res.ok || data.ok === false) {
+                    showResult(data.message || 'Không tìm thấy giữ chỗ.');
+                    return;
+                }
+
+                // Chuẩn hoá dữ liệu
+                holdCtx = {
+                    holdId: data.holdId || data._id,
+                    routeCode: data.routeCode,
+                    date: data.date,
+                    departHM: data.departHM,
+                    seatCodes: data.seatCodes || [],
+                    priceEach: data.priceEach || 0,
+                    expiresAt: data.expiresAt
+                };
+
+                // Render UI
+                const routeText = ROUTE_LABEL[holdCtx.routeCode] || holdCtx.routeCode;
+                byId('routeText').textContent = routeText;
+                byId('departText').textContent = `${holdCtx.date} • ${holdCtx.departHM}`;
+
+                byId('seatList').innerHTML = holdCtx.seatCodes
+                    .map(s => `<span class="seat-chip">${s}</span>`).join('');
+
+                const total = holdCtx.seatCodes.length * holdCtx.priceEach;
+                byId('priceEach').textContent = fmtVND(holdCtx.priceEach);
+                byId('totalAmount').textContent = fmtVND(total);
+                byId('totalAmount').dataset.amount = total;
+
+                // Right summary
+                byId('summaryRoute').textContent = routeText;
+                byId('summaryDepart').textContent = `${holdCtx.date} • ${holdCtx.departHM}`;
+                byId('summarySeats').textContent = holdCtx.seatCodes.join(', ');
+                byId('summaryPriceEach').textContent = fmtVND(holdCtx.priceEach);
+                byId('summaryTotal').textContent = fmtVND(total);
+
+                // Điểm đón/trả
+                renderOptions(PICKUP_POINTS[holdCtx.routeCode], byId('pickupList'));
+                renderOptions(DROPOFF_POINTS[holdCtx.routeCode], byId('dropoffList'));
+
+                // Countdown
+                startCountdown(holdCtx.expiresAt);
+
+            } catch (err) {
+                console.error(err);
+                showResult('Không thể tải giữ chỗ.');
+            }
+        }
+
+
+        /* ===========================================================
+           COUNTDOWN
+        =========================================================== */
+        function startCountdown(expiresAt) {
+            clearInterval(timer);
+            const end = new Date(expiresAt).getTime();
+            const el = byId('leftTime');
+
+            function tick() {
+                const left = Math.max(0, end - Date.now());
+                const mm = String(Math.floor(left / 60000)).padStart(2, '0');
+                const ss = String(Math.floor((left % 60000) / 1000)).padStart(2, '0');
+                el.textContent = `${mm}:${ss}`;
+
+                if (left <= 0) {
+                    clearInterval(timer);
+                    disableHoldExpired();
+                }
+            }
+
+            tick();
+            timer = setInterval(tick, 1000);
+        }
+
+
+        /* ===========================================================
+           HẾT GIỮ CHỖ → KHÓA FORM
+        =========================================================== */
+        function disableHoldExpired() {
+            byId('btnConfirm').disabled = true;
+            byId('btnCancel').disabled = true;
+
+            byId('formMsg').textContent = 'Giữ chỗ đã hết hạn. Vui lòng quay lại chọn ghế.';
+            byId('formMsg').classList.add('text-danger');
+
+            byId('holdExpiredMsg').classList.add('show');
+        }
+
+        function showResult(html) {
+            byId('cardResult').classList.remove('d-none');
+            byId('resultText').innerHTML = html;
+            byId('customerForm').closest('.card-clean').classList.add('d-none');
+            byId('cardHold').classList.add('d-none');
+
+            setStepActive(5);
+        }
+        window.addEventListener("DOMContentLoaded", () => {
+
+            console.log("Checkout loaded OK");
+
+            loadUserInfo(); // kiểm tra đăng nhập + auto-fill
+            setStepActive(3); // bước hiện tại
+            loadHold(); // tải giữ chỗ
+
+        });
+    </script>
+    <script>
+        /* ===========================================================
+                                                                                   HÀM HỖ TRỢ UX – Loading nút
+                                                                                =========================================================== */
+        function setLoading(isLoading, text = 'Đang xử lý...') {
+            const btn = byId('btnConfirm');
+            if (isLoading) {
+                btn.disabled = true;
+                btn.dataset.prev = btn.innerHTML;
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>${text}`;
+            } else {
+                btn.disabled = false;
+                if (btn.dataset.prev) btn.innerHTML = btn.dataset.prev;
+            }
+        }
+
+
+        /* ===========================================================
+           SUBMIT FORM ĐẶT VÉ
+        =========================================================== */
+        byId('customerForm').addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const form = e.currentTarget;
+
+            // Validate Bootstrap
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            if (!holdCtx) return;
+
+            // Kiểm tra hết thời gian giữ chỗ
+            const [mm, ss] = (byId('leftTime').textContent || '00:00')
+            .split(':').map(Number);
+            if ((mm * 60 + ss) <= 0) {
+                byId('formMsg').textContent = 'Giữ chỗ đã hết hạn.';
+                byId('formMsg').classList.add('text-danger');
+                return;
+            }
+
+            // Build payload
+            const payload = {
+                holdId: holdCtx.holdId,
+                customer: {
+                    name: byId('name').value.trim(),
+                    phone: byId('phone').value.trim(),
+                    email: byId('email').value.trim() || undefined,
+                    pickupPoint: byId('pickupPoint').value.trim(),
+                    dropoffPoint: byId('dropoffPoint').value.trim(),
+                    note: byId('note').value.trim() || undefined
+                },
+                paymentMethod: byId('paymentMethod').value
+            };
+
+            byId('formMsg').textContent = '';
+            setLoading(true, 'Đang xác nhận đặt vé...');
+
+            try {
+                const res = await fetch(`${API_BASE}/bookings/confirm`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!res.ok || data.ok === false) {
+                    setLoading(false);
+                    byId('formMsg').classList.add('text-danger');
+                    byId('formMsg').textContent = data.message || 'Đặt vé thất bại.';
+                    return;
+                }
+
+                // Thành công
+                clearInterval(timer);
+                const bookingId = data.bookingId || data._id;
+                const method = payload.paymentMethod;
+
+                /* =======================================================
+                   TH1: COD – Hiển thị kết quả ngay
+                ======================================================= */
+                if (method === 'cod') {
+                    const seatCount = holdCtx.seatCodes.length;
+                    const total = seatCount * holdCtx.priceEach;
+
+                    showResult(`
+        <p class="fw-bold">Đặt vé thành công! (Thanh toán khi lên xe)</p>
+        <p>Mã vé: <span class="mono">${bookingId}</span></p>
+        <p>
+          Tuyến: <strong>${ROUTE_LABEL[holdCtx.routeCode]}</strong><br>
+          Khởi hành: <strong>${holdCtx.date}</strong> • <strong>${holdCtx.departHM}</strong><br>
+          Ghế: <strong>${holdCtx.seatCodes.join(', ')}</strong><br>
+          Tổng tiền: <strong>${fmtVND(total)}</strong>
+        </p>
+      `);
+
+                    return;
+                }
+
+                /* =======================================================
+                   TH2: VNPay
+                ======================================================= */
+                if (method === 'vnpay') {
+                    setStepActive(4);
+                    await doVnpayRedirect(bookingId);
+                    return;
+                }
+
+                /* =======================================================
+                   TH3: MoMo
+                ======================================================= */
+                if (method === 'momo') {
+                    setStepActive(4);
+                    await doMomoRedirect(bookingId);
+                    return;
+                }
+
+            } catch (err) {
+                console.error(err);
+                byId('formMsg').classList.add('text-danger');
+                byId('formMsg').textContent = 'Lỗi kết nối. Vui lòng thử lại.';
+            }
+
+            setLoading(false);
+        });
+
+
+        /* ===========================================================
+           REDIRECT VNPAY
+        =========================================================== */
+        async function doVnpayRedirect(bookingId) {
+            try {
+                const amount = Number(byId('totalAmount').dataset.amount || 0);
+                const route = ROUTE_LABEL[holdCtx.routeCode];
+                const depart = `${holdCtx.date} • ${holdCtx.departHM}`;
+                const seats = holdCtx.seatCodes.join(', ');
+                const name = byId('name').value.trim();
+                const phone = byId('phone').value.trim();
+
+                const orderInfo =
+                    `Ve ${route} ${depart} | Ghe: ${seats} | KH: ${name} | SDT: ${phone}`;
+
+                const resp = await fetch(`${API_BASE}/payment/create_vnpay_url`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount,
+                        orderId: bookingId,
+                        orderInfo
+                    })
+                });
+
+                if (!resp.ok) throw new Error('Tạo link VNPay thất bại');
+
+                const {
+                    paymentUrl
+                } = await resp.json();
+                if (!paymentUrl) throw new Error('Không có paymentUrl');
+
+                window.location.href = paymentUrl;
+
+            } catch (err) {
+                console.error(err);
+                setLoading(false);
+                byId('formMsg').classList.add('text-danger');
+                byId('formMsg').textContent =
+                    'Không thể tạo thanh toán VNPay. Thử lại hoặc chọn phương thức khác.';
+            }
+        }
+
+
+        /* ===========================================================
+           REDIRECT MOMO
+        =========================================================== */
+        async function doMomoRedirect(bookingId) {
+            try {
+                const amount = Number(byId('totalAmount').dataset.amount || 0);
+                const routeLabel = ROUTE_LABEL[holdCtx.routeCode];
+                const seats = holdCtx.seatCodes.join(', ');
+                const orderInfo = `Ve: ${routeLabel} | Ngay: ${holdCtx.date} | Gio: ${holdCtx.departHM} | Ghe: ${seats}`;
+
+                const resp = await fetch(`${API_BASE}/payment/momo/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount,
+                        orderId: bookingId,
+                        orderInfo
+                    })
+                });
+
+                if (!resp.ok) throw new Error('Tạo link MoMo thất bại');
+
+                const data = await resp.json();
+                if (!data.payUrl) throw new Error('Không có payUrl');
+
+                window.location.href = data.payUrl;
+
+            } catch (err) {
+                console.error(err);
+                setLoading(false);
+                byId('formMsg').classList.add('text-danger');
+                byId('formMsg').textContent =
+                    'Không thể tạo thanh toán MoMo. Thử lại hoặc chọn phương thức khác.';
+            }
+        }
+    </script>
+    <script>
+        /* ===========================================================
+                                                                                   HÀM HỖ TRỢ UX – Loading nút
+                                                                                =========================================================== */
+        function setLoading(isLoading, text = 'Đang xử lý...') {
+            const btn = byId('btnConfirm');
+            if (isLoading) {
+                btn.disabled = true;
+                btn.dataset.prev = btn.innerHTML;
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>${text}`;
+            } else {
+                btn.disabled = false;
+                if (btn.dataset.prev) btn.innerHTML = btn.dataset.prev;
+            }
+        }
+    </script>
+
+    <script>
+        /* ===========================================================
+                                                                                   THANH TOÁN VÍ ĐIỆN TỬ DEMO (QR CODE)
+                                                                                   → Dùng khi bạn muốn test mô phỏng ví Momo / ZaloPay
+                                                                                =========================================================== */
+        let payTimer = null;
+        let pollTimer = null;
+
+        async function createWalletPayment(bookingId, method) {
+            // Ẩn form – hiện card kết quả
+            byId('cardResult').classList.remove('d-none');
+            byId('customerForm').closest('.card-clean').classList.add('d-none');
+            byId('cardHold').classList.add('d-none');
+            byId('resultText').innerHTML = `<p>Tạo yêu cầu thanh toán...</p>`;
+
+            try {
+                const res = await fetch(`${API_BASE}/payments/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        bookingId,
+                        method
+                    })
+                });
+
+                const p = await res.json();
+                if (!res.ok || p.ok === false) {
+                    byId('resultText').innerHTML =
+                        `<p class="text-danger">Không tạo được thanh toán: ${p.message || ''}</p>`;
+                    setLoading(false);
+                    return;
+                }
+
+                // Hiển thị giao diện thanh toán
+                byId('resultText').innerHTML = `
+      <div class="d-flex justify-content-between flex-wrap gap-3">
+        <div>
+          <div>Phương thức: <strong>${method.toUpperCase()}</strong></div>
+          <div>Số tiền: <strong>${fmtVND(p.amount)}</strong></div>
+          <div>Hết hạn: <span id="payLeft" class="mono">--:--</span></div>
+
+          <div class="mt-3 d-flex gap-2">
+            <a class="btn btn-success" href="${p.payUrl}" target="_blank" rel="noopener">Mở link thanh toán</a>
+            <button id="btnCopyLink" class="btn btn-outline-secondary">Sao chép link</button>
+          </div>
+        </div>
+
+        <div>
+          <img src="${p.qrImageDataUrl}" alt="QR" 
+               style="width:220px;height:220px;border:1px solid #ddd;border-radius:8px;">
+        </div>
+      </div>
+
+      <div class="mt-2">Quét QR hoặc nhấn “Mở link thanh toán”.</div>
+      <div class="mt-2">Trạng thái: <span id="payStatus" class="badge bg-warning text-dark">Đang chờ...</span></div>
+    `;
+
+                // Copy link
+                document.getElementById('btnCopyLink').onclick = async() => {
+                    try {
+                        await navigator.clipboard.writeText(p.payUrl);
+                        alert('Đã sao chép link!');
+                    } catch {
+                        alert('Không thể sao chép, copy thủ công nhé.');
+                    }
+                };
+
+                // Countdown + polling
+                startPayCountdown(p.expiresAt);
+                startPollingPayment(p.intentId);
+
+                setLoading(false);
+
+            } catch (err) {
+                console.error(err);
+                byId('resultText').innerHTML = `<p class="text-danger">Lỗi kết nối khi tạo thanh toán.</p>`;
+                setLoading(false);
+            }
+        }
+
+
+        /* ===========================================================
+           COUNTDOWN THANH TOÁN DEMO
+        =========================================================== */
+        function startPayCountdown(expiresAt) {
+            clearInterval(payTimer);
+            const end = new Date(expiresAt).getTime();
+            const el = byId('payLeft');
+
+            function tick() {
+                const left = Math.max(0, end - Date.now());
+                const mm = String(Math.floor(left / 60000)).padStart(2, '0');
+                const ss = String(Math.floor((left % 60000) / 1000)).padStart(2, '0');
+                el.textContent = `${mm}:${ss}`;
+
+                if (left <= 0) {
+                    clearInterval(payTimer);
+                    const ps = byId('payStatus');
+                    ps.textContent = 'Hết hạn';
+                    ps.className = 'badge bg-secondary';
+                }
+            }
+
+            tick();
+            payTimer = setInterval(tick, 1000);
+        }
+
+
+        /* ===========================================================
+           POLLING TRẠNG THÁI THANH TOÁN DEMO
+        =========================================================== */
+        function startPollingPayment(intentId) {
+            clearInterval(pollTimer);
+
+            async function poll() {
+                try {
+                    const res = await fetch(`${API_BASE}/payments/${intentId}/status`);
+                    const data = await res.json();
+
+                    if (!res.ok || data.ok === false) return;
+
+                    const ps = byId('payStatus');
+
+                    if (data.status === 'pending') return;
+
+                    if (data.status === 'paid') {
+                        ps.textContent = 'Đã thanh toán';
+                        ps.className = 'badge bg-success';
+                        clearInterval(pollTimer);
+
+                        // Chuyển sang bước 5
+                        setStepActive(5);
+                    } else if (data.status === 'expired' || data.status === 'cancelled') {
+                        ps.textContent = data.status === 'expired' ? 'Hết hạn' : 'Đã huỷ';
+                        ps.className = 'badge bg-secondary';
+                        clearInterval(pollTimer);
+                    }
+
+                } catch {}
+            }
+
+            pollTimer = setInterval(poll, 3000);
+        }
+
+
+        /* ===========================================================
+           HUỶ GIỮ CHỖ
+        =========================================================== */
+        byId('btnCancel').addEventListener('click', async() => {
+            if (!holdCtx) return;
+
+            if (!confirm('Xác nhận huỷ giữ chỗ?')) return;
+
+            byId('btnCancel').disabled = true;
+
+            try {
+                await fetch(`${API_BASE}/holds/${holdCtx.holdId}`, {
+                    method: 'DELETE'
+                });
+            } catch {}
+
+            showResult('<p>Đã huỷ giữ chỗ. Bạn có thể quay lại chọn chuyến khác.</p>');
+        });
+
+
+        /* ===========================================================
+           KHỞI ĐỘNG CUỐI CÙNG
+        =========================================================== */
+        console.log('Checkout loaded OK');
+
+        (function() {
+            const transferOptionSelect = document.getElementById('transferOption');
+            const pickupAddressInput = document.getElementById('pickupAddress');
+            const dropoffAddressInput = document.getElementById('dropoffAddress');
+            const transferTimeNoteInput = document.getElementById('transferTimeNote');
+            const btnUseCurrentLocation = document.getElementById('btnUseCurrentLocation');
+            const mapWrapper = document.getElementById('mapWrapper');
+            const mapPreview = document.getElementById('mapPreview');
+
+            if (!transferOptionSelect) {
+                // Không có UI trung chuyển thì thôi
+                return;
+            }
+
+            // 🧠 Tự bật/tắt các ô địa chỉ theo lựa chọn
+            function updateTransferFields() {
+                const val = transferOptionSelect.value || 'none';
+
+                const needPickup = val === 'pickup' || val === 'both';
+                const needDropoff = val === 'dropoff' || val === 'both';
+
+                if (pickupAddressInput) {
+                    pickupAddressInput.disabled = !needPickup;
+                    if (!needPickup) pickupAddressInput.value = '';
+                }
+
+                if (dropoffAddressInput) {
+                    dropoffAddressInput.disabled = !needDropoff;
+                    if (!needDropoff) dropoffAddressInput.value = '';
+                }
+
+                if (transferTimeNoteInput) {
+                    // Nếu có trung chuyển thì mở ghi chú, không thì cho phép để trống
+                    transferTimeNoteInput.disabled = (val === 'none');
+                    if (val === 'none') transferTimeNoteInput.value = '';
+                }
+
+                // Nếu không cần trung chuyển thì ẩn map luôn
+                if (val === 'none' && mapWrapper) {
+                    mapWrapper.style.display = 'none';
+                    if (mapPreview) mapPreview.src = '';
+                }
+            }
+
+            updateTransferFields();
+            transferOptionSelect.addEventListener('change', updateTransferFields);
+
+            // 📍 Nút "Lấy vị trí của tôi" – dùng geolocation + hiển thị Google Maps
+            if (btnUseCurrentLocation && pickupAddressInput) {
+                btnUseCurrentLocation.addEventListener('click', () => {
+                    if (!navigator.geolocation) {
+                        alert('Trình duyệt không hỗ trợ định vị GPS.');
+                        return;
+                    }
+
+                    btnUseCurrentLocation.disabled = true;
+                    btnUseCurrentLocation.textContent = 'Đang lấy vị trí...';
+
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            const lat = pos.coords.latitude;
+                            const lng = pos.coords.longitude;
+
+                            // Ghi mô tả tạm vào ô địa chỉ (khách có thể sửa lại)
+                            pickupAddressInput.value =
+                                pickupAddressInput.value && !pickupAddressInput.value.startsWith('Vị trí hiện tại') ?
+                                pickupAddressInput.value :
+                                `Vị trí hiện tại (lat: ${lat.toFixed(5)}, lng: ${lng.toFixed(5)})`;
+
+                            // Hiện bản đồ Google Maps embed
+                            if (mapPreview && mapWrapper) {
+                                const gmapUrl = `https://www.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+                                mapPreview.src = gmapUrl;
+                                mapWrapper.style.display = 'block';
+                            }
+
+                            btnUseCurrentLocation.disabled = false;
+                            btnUseCurrentLocation.textContent = 'Lấy vị trí của tôi';
+                        },
+                        (err) => {
+                            console.error('Geolocation error:', err);
+                            alert('Không lấy được vị trí. Bạn vui lòng bật GPS / cho phép truy cập vị trí nhé.');
+                            btnUseCurrentLocation.disabled = false;
+                            btnUseCurrentLocation.textContent = 'Lấy vị trí của tôi';
+                        }, {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0,
+                        }
+                    );
+                });
+            }
+        })();
+    </script>
+
+</body>
+
+</html>
