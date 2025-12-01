@@ -1,0 +1,1222 @@
+:root {
+    --primary: #0A5AD7;
+    --primary-600: #0C63E7;
+    --primary-700: #0847A5;
+    --primary-50: #f4f7ff;
+    --primary-100: #eaf0ff;
+    --accent: #FFD03B;
+    /* Vàng nhạt cho nút nổi bật */
+    --accent-700: #E0B200;
+    --text: #0F172A;
+    /* chữ đậm */
+    --text-soft: #475569;
+    /* chữ phụ */
+    --muted: #94A3B8;
+    /* chữ mờ */
+    --success: #14B885;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --bg: #F5F7FB;
+    /* nền sáng dịu */
+    --card: #FFFFFF;
+    --border: #E5E7EB;
+    --shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --focus-ring: 0 0 0 3px rgba(10, 90, 215, 0.25);
+}
+
+
+/* ---------- Reset chung ---------- */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+
+/* Khi focus vào input, button, link */
+
+:where(a, button, input, select, textarea, [tabindex]):focus {
+    outline: none;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    box-shadow: var(--focus-ring);
+    border-color: var(--primary-600) !important;
+}
+
+
+/* ---------- Header / Navbar (gọn hơn) ---------- */
+
+
+/* đặt chiều cao header 56px (có thể đổi 52–64 tuỳ ý) */
+
+:root {
+    --header-h: 56px;
+}
+
+header.bg-primary {
+    position: fixed;
+    inset: 0 auto auto 0;
+    /* top:0; left:0 */
+    width: 100%;
+    z-index: 1000;
+    background: linear-gradient(120deg, rgba(10, 90, 215, .98) 0%, rgba(7, 73, 167, .98) 42%, rgba(13, 65, 131, .95) 100%);
+    box-shadow: 0 4px 16px rgba(10, 90, 215, .15);
+    /* làm gọn theo chiều dọc */
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    /* căn giữa theo chiều dọc */
+    padding: 0 16px;
+    /* chỉ còn padding ngang */
+}
+
+
+/* chừa khoảng trống đúng bằng chiều cao header */
+
+body {
+    padding-top: var(--header-h);
+}
+
+
+/* logo gọn lại 36px (tuỳ chỉnh 32–40) */
+
+.left-section .logo {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-right: 10px;
+    border: 2px solid rgba(255, 255, 255, .6);
+}
+
+
+/* tiêu đề thương hiệu */
+
+header h1 {
+    font-size: 1.1rem;
+    /* nhỏ hơn chút */
+    font-weight: 800;
+    letter-spacing: .2px;
+    margin: 0;
+}
+
+
+/* nút bên phải: giảm padding dọc để header đỡ cao */
+
+#userSection .btn {
+    padding: 6px 12px;
+    /* trước đây có thể đang lớn hơn */
+    border-radius: 999px;
+    font-weight: 600;
+    border: none;
+}
+
+#userSection .btn-light {
+    background: #fff;
+}
+
+#userSection .btn-danger {
+    background: var(--danger);
+}
+
+
+/* Dropdown (giữ nguyên nếu dùng) */
+
+.dropdown .btn {
+    padding: 6px 12px;
+}
+
+.dropdown-menu {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+}
+
+.dropdown-item {
+    white-space: normal;
+    font-size: .95rem;
+}
+
+
+/* Responsive: trên mobile giảm thêm một chút */
+
+@media (max-width: 576px) {
+     :root {
+        --header-h: 52px;
+    }
+    /* header thấp hơn */
+    header h1 {
+        font-size: 1rem;
+    }
+    #userSection .btn {
+        padding: 5px 10px;
+    }
+    .left-section .logo {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+
+/* ---------- Banner chính ---------- */
+
+.banner {
+    position: relative;
+    min-height: 52vh;
+    background: url('https://png.pngtree.com/thumb_back/fh260/background/20230704/pngtree-3d-render-of-aluminum-supercar-against-carbon-fiber-background-image_3736487.jpg') center/cover no-repeat;
+    border-bottom-left-radius: var(--radius-2xl);
+    border-bottom-right-radius: var(--radius-2xl);
+    overflow: hidden;
+}
+
+.banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(1200px 600px at 70% 0%, rgba(10, 90, 215, .35), rgba(10, 90, 215, .1) 40%, transparent 70%), linear-gradient(180deg, rgba(2, 6, 23, .55), rgba(2, 6, 23, .15));
+    backdrop-filter: saturate(115%) blur(1px);
+}
+
+.banner-content {
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, .25);
+    max-width: 900px;
+    padding: 3rem 1rem;
+}
+
+.banner-content h2 {
+    font-weight: 800;
+}
+
+.banner .btn.btn-warning {
+    background: var(--accent);
+    border: none;
+    color: #1f2937;
+    font-weight: 800;
+    padding: 12px 22px;
+    border-radius: 999px;
+    box-shadow: 0 10px 24px rgba(245, 158, 11, .25);
+}
+
+.banner .btn.btn-warning:hover {
+    background: #ffd96a;
+}
+
+
+/* ---------- Tiêu đề các phần ---------- */
+
+.section-title {
+    /* QUAN TRỌNG: ép khối tiêu đề phủ 100% để căn giữa hẳn */
+    display: block !important;
+    width: 100% !important;
+    margin: 0 auto 14px !important;
+    text-align: center !important;
+    font-weight: 800;
+    letter-spacing: .2px;
+    position: relative;
+    color: var(--primary-700);
+}
+
+.section-title::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -10px;
+    width: 58%;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--primary-600), var(--primary));
+}
+
+
+/* === PATCH: Tăng kích thước .section-title (responsive) === */
+
+.section-title {
+    /* Lớn nhưng gọn hơn trên desktop, vẫn to trên mobile */
+    font-size: clamp(2rem, 3.2vw + 0.6rem, 3.25rem) !important;
+    /* ~32 → ~52px */
+    line-height: 1.15 !important;
+    letter-spacing: .2px;
+    font-weight: 800;
+    color: var(--primary-700);
+    margin: 0 auto 18px !important;
+    /* tăng khoảng dưới một chút cho gạch */
+    text-align: center !important;
+    text-wrap: balance;
+}
+
+
+/* Gạch dưới ngắn lại để thanh thoát, dày vừa đủ */
+
+.section-title::after {
+    height: 6px !important;
+    bottom: -12px !important;
+    width: 60% !important;
+    /* trước là 60%, rút lại cho cân cột form */
+    background: linear-gradient(90deg, var(--primary-600), var(--primary));
+    border-radius: 999px;
+}
+
+
+/* Tablet: chữ giữ size tốt, gạch rộng hơn chút */
+
+@media (max-width: 992px) {
+    .section-title {
+        font-size: clamp(1.9rem, 3.8vw + 0.4rem, 2.6rem) !important;
+        margin-bottom: 16px !important;
+    }
+    .section-title::after {
+        width: 52% !important;
+        bottom: -10px !important;
+    }
+}
+
+
+/* Mobile: vẫn to nhưng không vỡ layout, gạch dài hơn cho cân khung */
+
+@media (max-width: 576px) {
+    .section-title {
+        font-size: clamp(1.6rem, 6vw + 0.2rem, 2.1rem) !important;
+        /* ~26–34px */
+        margin-bottom: 14px !important;
+    }
+    .section-title::after {
+        width: 66% !important;
+        height: 4px !important;
+        bottom: -8px !important;
+    }
+}
+
+
+/* ---------- Hộp tìm chuyến xe ---------- */
+
+.search-section {
+    margin-top: -40px;
+    padding: 60px 0;
+}
+
+.search-box {
+    /* giữ bo góc lớn */
+    border-radius: var(--radius-2xl);
+    /* viền xanh nhạt */
+    border: 1.5px solid rgba(12, 99, 231, .35) !important;
+    /* #0C63E7 ~ var(--primary-600) */
+    /* đổ bóng nhẹ + vòng sáng xanh rất mờ */
+    box-shadow: 0 8px 24px rgba(16, 24, 40, .08), /* shadow mềm dưới khối */
+    0 0 0 3px rgba(12, 99, 231, .12);
+    /* "vòng" xanh mờ xung quanh */
+    background: var(--card);
+    /* nền trắng */
+}
+
+
+/* Hover: viền rõ hơn chút, sáng hơn nhẹ */
+
+.search-box:hover {
+    border-color: rgba(12, 99, 231, .48) !important;
+    box-shadow: 0 10px 28px rgba(16, 24, 40, .10), 0 0 0 3.5px rgba(12, 99, 231, .14);
+}
+
+
+/* Khi focus vào input bên trong: nhấn mạnh viền/vòng sáng */
+
+.search-box:focus-within {
+    border-color: var(--primary-600) !important;
+    box-shadow: 0 12px 32px rgba(16, 24, 40, .12), 0 0 0 4px rgba(12, 99, 231, .18);
+}
+
+.form-label {
+    color: var(--text-soft);
+}
+
+.form-control,
+.form-select {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: .65rem .9rem;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-600);
+    box-shadow: var(--focus-ring);
+}
+
+.btn-find-trip {
+    background: linear-gradient(180deg, var(--primary-600), var(--primary));
+    color: #fff;
+    font-weight: 700;
+    border-radius: 14px;
+    border: none;
+    padding: .85rem 1rem;
+    box-shadow: 0 12px 24px rgba(10, 90, 215, .22);
+    width: 100%;
+}
+
+.btn-find-trip:hover {
+    filter: brightness(1.05);
+}
+
+
+/* tạo khoảng cách hợp lý giữa form tìm kiếm và danh sách */
+
+.search-section+.trip-list {
+    margin-top: 40px;
+}
+
+
+/* ---------- Nút bấm chung ---------- */
+
+.btn-primary {
+    background: linear-gradient(180deg, var(--primary-600), var(--primary));
+    border: none;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.05);
+}
+
+.btn-success {
+    background: var(--success);
+    border: none;
+}
+
+.btn-success:hover {
+    filter: brightness(1.05);
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: #111827;
+    border: none;
+}
+
+.btn-secondary:hover {
+    filter: brightness(0.97);
+}
+
+
+/* --- Trip list layout --- */
+
+.trip-group {
+    margin-bottom: 2.5rem;
+}
+
+.trip-group__header {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin: .75rem 0 1rem;
+}
+
+.trip-group__header h3 {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.dot {
+    width: .75rem;
+    height: .75rem;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+.dot--go {
+    background: #0ea5e9;
+}
+
+
+/* xanh đi */
+
+.dot--back {
+    background: #a855f7;
+}
+
+
+/* tím về */
+
+
+/* Auto-fit Grid: thẻ card tự căn đều, không lệch hàng */
+
+.trip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 16px;
+}
+
+
+/* Card style hiện đại */
+
+.trip-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, .06);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .06);
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.trip-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .10);
+    border-color: rgba(14, 165, 233, .35);
+}
+
+.trip-card__body {
+    padding: 16px 18px 14px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.trip-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 .5rem;
+}
+
+.trip-meta {
+    margin: 0 0 .35rem;
+}
+
+.trip-meta strong {
+    font-weight: 700;
+}
+
+.trip-footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .82rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 6px 10px;
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.badge--price {
+    background: #ecfeff;
+    color: #0369a1;
+}
+
+.badge--seats {
+    background: #f3f0ff;
+    color: #6b21a8;
+}
+
+.btn-book {
+    border: 0;
+    background: #0d6efd;
+    color: #fff;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.btn-book:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+
+/* Chọn ghế*/
+
+.seat-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.seat-cell {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid rgba(0, 0, 0, .08);
+    background: #fff;
+}
+
+.seat-cell.is-null {
+    visibility: hidden;
+}
+
+.seat-cell.is-booked {
+    background: #ef4444;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.seat-cell.is-held {
+    background: #f59e0b;
+    color: #000;
+    cursor: not-allowed;
+}
+
+.seat-cell.is-free {
+    background: #f8fafc;
+}
+
+.seat-cell.is-selected {
+    background: #0d6efd;
+    color: #fff;
+}
+
+
+/* ---------- Đánh giá dịch vụ ---------- */
+
+
+/* ==== REVIEW LAYOUT ==== */
+
+.reviews-wrapper {
+    margin: 32px auto 40px;
+    max-width: 1080px;
+    padding: 16px 12px 0;
+}
+
+.reviews-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .reviews-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+
+/* LEFT COLUMN */
+
+.reviews-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+/* RIGHT COLUMN (FORM) */
+
+.reviews-right {
+    background: var(--card, #ffffff);
+    border-radius: 20px;
+    padding: 24px 22px 26px;
+    box-shadow: var(--shadow, 0 10px 30px rgba(15, 23, 42, 0.08));
+}
+
+
+/* SUMMARY CARD */
+
+.rating-summary-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 18px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #0a5ad7, #2563eb);
+    color: #ffffff;
+    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.35);
+}
+
+.rating-score {
+    text-align: left;
+}
+
+.rating-score span#ratingAverage {
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1;
+    display: block;
+}
+
+.rating-stars {
+    display: flex;
+    margin-top: 4px;
+}
+
+.rating-stars .star {
+    font-size: 1.1rem;
+    margin-right: 2px;
+    opacity: 0.75;
+}
+
+.rating-stars .star.filled {
+    opacity: 1;
+}
+
+.rating-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-top: 3px;
+}
+
+.rating-meta {
+    text-align: right;
+    font-size: 0.9rem;
+}
+
+.rating-count {
+    font-weight: 600;
+}
+
+.rating-note {
+    margin-top: 4px;
+    opacity: 0.88;
+}
+
+
+/* LIST HEADER */
+
+.reviews-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.reviews-list-header h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text, #0f172a);
+}
+
+.pill-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    background: var(--primary-50, #eaf0ff);
+    color: var(--primary-700, #0847a5);
+    font-weight: 600;
+}
+
+
+/* REVIEW CARDS */
+
+.reviews-wrapper {
+    margin: 32px auto 40px;
+    max-width: 1080px;
+    padding: 16px 12px 0;
+}
+
+.reviews-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .reviews-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+
+/* LEFT COLUMN */
+
+.reviews-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+/* RIGHT COLUMN (FORM) */
+
+.reviews-right {
+    background: var(--card, #ffffff);
+    border-radius: 20px;
+    padding: 24px 22px 26px;
+    box-shadow: var(--shadow, 0 10px 30px rgba(15, 23, 42, 0.08));
+}
+
+
+/* SUMMARY CARD */
+
+.rating-summary-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 18px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #0a5ad7, #2563eb);
+    color: #ffffff;
+    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.35);
+}
+
+.rating-score span#ratingAverage {
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1;
+    display: block;
+}
+
+.rating-stars {
+    display: flex;
+    margin-top: 4px;
+}
+
+.rating-stars .star {
+    font-size: 1.1rem;
+    margin-right: 2px;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.rating-stars .star.filled {
+    color: #fedb41;
+}
+
+.rating-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-top: 3px;
+}
+
+.rating-meta {
+    text-align: right;
+    font-size: 0.9rem;
+}
+
+.rating-count {
+    font-weight: 600;
+}
+
+.rating-note {
+    margin-top: 4px;
+    opacity: 0.88;
+}
+
+
+/* HEADER LIST + FILTER */
+
+.reviews-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.reviews-list-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reviews-list-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reviews-list-header h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text, #0f172a);
+}
+
+.pill-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    background: var(--primary-50, #eaf0ff);
+    color: var(--primary-700, #0847a5);
+    font-weight: 600;
+}
+
+.reviews-filter-select {
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border, #e5e7eb);
+    background: #fff;
+    color: var(--text-soft, #475569);
+}
+
+.reviews-toggle-btn {
+    border: none;
+    background: transparent;
+    font-size: 0.8rem;
+    color: var(--primary-700, #0847a5);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+
+/* REVIEW CARDS */
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.review-card {
+    display: flex;
+    gap: 12px;
+    padding: 14px 14px 12px;
+    border-radius: 16px;
+    background: var(--card, #ffffff);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0a5ad7, #22c55e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.review-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.review-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.review-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text, #0f172a);
+}
+
+.review-phone {
+    font-size: 0.8rem;
+    color: var(--muted, #94a3b8);
+}
+
+.review-stars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+
+/* Sao trong từng card đánh giá */
+
+.review-stars .star {
+    font-size: 0.9rem;
+    color: #e2e8f0;
+    /* màu xám nhạt cho sao chưa chọn */
+}
+
+.review-stars .star.filled {
+    color: #fbbf24;
+    /* sao được chọn màu vàng */
+}
+
+.review-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2px;
+}
+
+.review-date {
+    font-size: 0.78rem;
+    color: var(--muted, #94a3b8);
+}
+
+.review-chip {
+    font-size: 0.78rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--primary-50, #eaf0ff);
+    color: var(--primary-700, #0847a5);
+}
+
+.review-comment {
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: var(--text-soft, #475569);
+    line-height: 1.5;
+}
+
+
+/* EMPTY STATE */
+
+.reviews-empty {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--muted, #94a3b8);
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: #f8fafc;
+}
+
+
+/* FORM SIDE */
+
+.review-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text, #0f172a);
+}
+
+.review-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-soft, #64748b);
+    margin-bottom: 16px;
+}
+
+.review-form .form-group {
+    margin-bottom: 14px;
+}
+
+.review-form label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text, #0f172a);
+}
+
+.required {
+    color: #ef4444;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+    border: 1px solid var(--border, #e5e7eb);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    border-color: var(--primary, #0a5ad7);
+    box-shadow: var(--focus-ring, 0 0 0 3px rgba(37, 99, 235, 0.18));
+}
+
+.form-text-muted {
+    font-size: 0.78rem;
+    color: var(--muted, #94a3b8);
+    margin-top: 4px;
+}
+
+
+/* rating input (form) – ngang */
+
+.rating-input {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 4px;
+}
+
+.rating-input input {
+    display: none;
+}
+
+.rating-input label {
+    font-size: 1.6rem;
+    cursor: pointer;
+    color: #e2e8f0;
+    transition: color 0.15s ease, transform 0.1s ease;
+    padding: 0 2px;
+}
+
+.rating-input label:hover,
+.rating-input label:hover~label {
+    color: #fbbf24;
+    transform: translateY(-1px);
+}
+
+.rating-input input:checked~label {
+    color: #f59e0b;
+}
+
+
+/* button */
+
+.btn-primary.w-100 {
+    width: 100%;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    background: var(--primary, #0a5ad7);
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+}
+
+.btn-primary:hover {
+    background: var(--primary-600, #0c63e7);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.28);
+}
+
+.btn-primary:active,
+.btn-primary:disabled {
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
+    opacity: 0.9;
+}
+
+
+/* message */
+
+.review-message {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    display: none;
+}
+
+.review-message.success {
+    display: block;
+    background: #ecfdf3;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.review-message.error {
+    display: block;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+
+/* ---------- Footer ---------- */
+
+footer.bg-primary {
+    background: linear-gradient(180deg, var(--primary), var(--primary-700));
+    border-top-left-radius: var(--radius-2xl);
+    border-top-right-radius: var(--radius-2xl);
+    box-shadow: 0 -4px 16px rgba(10, 90, 215, 0.12);
+}
+
+
+/* ---------- Tiện ích ---------- */
+
+.text-primary {
+    color: var(--primary-700) !important;
+}
+
+.bg-white {
+    background: #fff !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 6px 18px rgba(2, 6, 23, .08) !important;
+}
+
+.rounded-3 {
+    border-radius: var(--radius-xl) !important;
+}
+
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 992px) {
+    .banner {
+        min-height: 46vh;
+    }
+    .trip-card {
+        max-width: 100%;
+    }
+    .seat-grid {
+        grid-template-columns: repeat(5, 42px);
+    }
+    .seat {
+        width: 42px;
+        height: 42px;
+    }
+}
+
+@media (max-width: 576px) {
+    .banner {
+        min-height: 42vh;
+    }
+    .banner-content h2 {
+        font-size: 1.6rem;
+    }
+    #userSection .btn {
+        padding: 6px 10px;
+    }
+    .seat-grid {
+        grid-template-columns: repeat(4, 40px);
+    }
+    .seat {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+
+/* ---------- Lớp tiện ích cho JS ---------- */
+
+.hide {
+    display: none !important;
+}
+
+.show-flex {
+    display: flex !important;
+}
+
+.show {
+    display: block !important;
+}

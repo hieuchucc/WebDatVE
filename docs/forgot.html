@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quên Mật Khẩu</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* === BACKGROUND IMAGE === */
+            background: url("https://png.pngtree.com/background/20250104/original/pngtree-free-hd-wallpaper-4k-new-background-picture-image_15546678.jpg") no-repeat center center / cover;
+            position: relative;
+        }
+        /* Lớp mờ phía sau container cho dễ nhìn */
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.70);
+            /* chỉnh độ mờ */
+            backdrop-filter: blur(1px);
+            z-index: 0;
+        }
+        
+        .container {
+            width: 900px;
+            height: 450px;
+            background: #fff;
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex;
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+            /* giúp nằm trên overlay */
+        }
+        /* LEFT */
+        
+        .left-box {
+            width: 50%;
+            background: linear-gradient(to bottom right, #00c6ff, #007bff);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            padding: 40px;
+        }
+        
+        .left-box h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+        /* RIGHT */
+        
+        .right-box {
+            width: 50%;
+            padding: 40px;
+        }
+        
+        .right-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .input-group input {
+            width: 360px;
+            padding: 12px 40px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: gray;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px;
+            border: none;
+            color: #fff;
+            background: linear-gradient(to right, #007bff, #00c6ff);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+        
+        .back-link {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            color: #007bff;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        /* Responsive */
+        
+        @media(max-width: 768px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+                width: 95%;
+            }
+            .left-box,
+            .right-box {
+                width: 100%;
+                height: auto;
+            }
+            .left-box h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="left-box">
+            <h1>Quên mật khẩu?</h1>
+            <p>Nhập email hoặc số điện thoại để nhận mã khôi phục và đặt lại mật khẩu tài khoản của bạn.</p>
+        </div>
+
+        <div class="right-box">
+            <h2>Yêu cầu đặt lại mật khẩu</h2>
+
+            <form id="forgotForm">
+                <div class="input-group">
+                    <i class="fa fa-envelope"></i>
+                    <input id="identifier" type="text" placeholder="Email hoặc Số điện thoại" required>
+                </div>
+
+                <button class="btn-submit">Gửi mã OTP</button>
+            </form>
+
+            <a href="login.html" class="back-link">← Quay lại đăng nhập</a>
+            <div id="alertHost"></div>
+        </div>
+
+    </div>
+
+   <script>
+
+    const API = "https://webdatve.onrender.com/api/auth/forgot";
+
+    function showAlert(msg, type = "danger") {
+        document.getElementById("alertHost").innerHTML =
+            `<div class="alert alert-${type}" style="margin-top:15px">${msg}</div>`;
+    }
+
+    document.getElementById("forgotForm").addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const identifier = document.getElementById("identifier").value.trim();
+
+        try {
+            const res = await fetch(API, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ identifier })
+            });
+
+            const data = await res.json();
+            if (!res.ok) return showAlert(data.message || "Gửi OTP thất bại");
+
+            // Lưu lại để màn reset dùng tiếp
+            localStorage.setItem("resetIdentifier", identifier);
+            showAlert("Đã gửi mã OTP!", "success");
+
+            setTimeout(() => window.location.href = "reset.html", 800);
+
+        } catch {
+            showAlert("Lỗi kết nối máy chủ");
+        }
+    });
+</script>
+
+</body>
+</html>
