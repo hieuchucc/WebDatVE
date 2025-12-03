@@ -20,7 +20,7 @@ const FRONTEND_FAIL = `${FRONTEND_URL}/payment-fail.html`;
 const { Booking } = require('../models/Booking');
 const { Hold } = require('../models/Hold');
 const { Trip } = require('../models/Trip');
-const PaymentIntent = require('../models/PaymentIntent');
+const { PaymentIntent } = require('../models/PaymentIntent');
 
 
 // ✅ BƯỚC 4: import mailer để gửi email xác nhận vé
