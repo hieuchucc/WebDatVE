@@ -47,81 +47,72 @@ const VNPAY_CONFIG_FALLBACK = {
 };
 
 /* ================== 1. TẠO LINK THANH TOÁN ================== */
-router.post("/create_vnpay_url", async (req, res) => {
+router.post('/create_vnpay_url', async (req, res) => {
   try {
     const clientIp =
-      req.headers["x-forwarded-for"] ||
+      req.headers['x-forwarded-for'] ||
       req.socket?.remoteAddress ||
-      "127.0.0.1";
+      '127.0.0.1';
 
-    const { amount: amountInput, orderId: orderIdInput, orderInfo, bankCode } =
-      req.body || {};
+    const {
+      amount: amountInput,
+      orderId: bookingId,   // bookingId chính là orderId client gửi lên
+      orderInfo,
+      bankCode,
+    } = req.body || {};
 
-    // 👉 TIMEZONE VIETNAM
-    const now = moment().tz("Asia/Ho_Chi_Minh");
-    const createDate = now.toDate();
-    const expireDate = now.clone().add(15, "minutes").toDate();
-
-    const vnpCreateDate = now.format("YYYYMMDDHHmmss");
-    const vnpExpireDate = now.clone().add(15, "minutes").format("YYYYMMDDHHmmss");
-
-    // 👉 ORDER ID
-    const orderId =
-      (
-        orderIdInput ||
-        createDate.getTime() + "-" + Math.floor(Math.random() * 1000)
-      ).toString();
-
-    // 👉 AMOUNT
-    const amount = amountInput ? Number(amountInput) : 10000;
-
-    // ================== FIX QUAN TRỌNG NHẤT ==================
-    // Nếu req.app.get không có (Render thường không set), thì dùng env
-    const config = req.app.get("vnpayConfig") || VNPAY_CONFIG_FALLBACK;
-
-    // VALIDATION CONFIG
-    if (
-      !config.vnp_Url ||
-      !config.vnp_ReturnUrl ||
-      !config.vnp_TmnCode ||
-      !config.vnp_HashSecret
-    ) {
-      console.error("❌ VNPay config missing:", config);
-
-      return res.status(500).json({
+    if (!bookingId) {
+      return res.status(400).json({
         ok: false,
-        message:
-          "Thiếu config VNPay (vnp_Url / vnp_ReturnUrl / vnp_TmnCode / vnp_HashSecret)",
+        message: 'Thiếu bookingId (orderId).',
       });
     }
 
-    // ================== LƯU INTENT ==================
+    // 🔥 Thời gian theo giờ VN
+    const now = moment().tz('Asia/Ho_Chi_Minh');
+    const expiresAt = now.clone().add(15, 'minutes').toDate(); // dùng cho PaymentIntent
+    const vnpCreateDate = now.format('YYYYMMDDHHmmss');
+    const vnpExpireDate = now.clone().add(15, 'minutes').format('YYYYMMDDHHmmss');
+
+    // Số tiền
+    const amount = amountInput ? Number(amountInput) : 10000;
+
+    // Mã giao dịch gửi cho VNPay (TXN REF)
+    const txnRef = (
+      Date.now().toString() +
+      Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+    );
+
+    // ============== TẠO PAYMENT INTENT LƯU DB ==============
     const intent = await PaymentIntent.create({
-      provider: "vnpay",
-      orderId,
+      bookingId,          // ✅ REQUIRED
+      method: 'vnpay',    // ✅ REQUIRED
       amount,
-      currency: "VND",
-      status: "pending",
-      clientIp,
-      meta: {
-        bankCode: bankCode || null,
-        orderInfo: orderInfo || "",
-      },
-      createDate,
-      expireDate,
+      currency: 'VND',
+      status: 'pending',
+      expiresAt,          // ✅ REQUIRED
+      providerTxnId: txnRef,   // để mapping với vnp_TxnRef
+      // nếu muốn lưu thêm meta sau này có thể sửa schema rồi thêm field khác
     });
 
+    // ============== BUILD PARAMS GỬI VNPay ==============
+    // nếu mày đang dùng env trực tiếp thì đoạn này dùng process.env.*
+    const vnp_Url = process.env.VNP_URL;
+    const vnp_ReturnUrl = process.env.VNP_RETURN_URL;
+    const vnp_TmnCode = process.env.VNP_TMN_CODE;
+    const vnp_HashSecret = process.env.VNP_HASH_SECRET;
+
     const params = {
-      vnp_Version: config.vnp_Version,
-      vnp_Command: "pay",
-      vnp_TmnCode: config.vnp_TmnCode,
-      vnp_Locale: "vn",
-      vnp_CurrCode: "VND",
-      vnp_TxnRef: orderId,
-      vnp_OrderInfo: orderInfo || `Thanh toan ve xe #${orderId}`,
-      vnp_OrderType: "other",
-      vnp_Amount: amount * 100,
-      vnp_ReturnUrl: config.vnp_ReturnUrl,
+      vnp_Version: '2.1.0',
+      vnp_Command: 'pay',
+      vnp_TmnCode,
+      vnp_Locale: 'vn',
+      vnp_CurrCode: 'VND',
+      vnp_TxnRef: txnRef, // dùng txnRef đã lưu trong providerTxnId
+      vnp_OrderInfo: orderInfo || `Thanh toan ve xe #${bookingId}`,
+      vnp_OrderType: 'other',
+      vnp_Amount: amount * 100, // VNPay yêu cầu nhân 100
+      vnp_ReturnUrl,
       vnp_IpAddr: clientIp,
       vnp_CreateDate: vnpCreateDate,
       vnp_ExpireDate: vnpExpireDate,
@@ -129,38 +120,39 @@ router.post("/create_vnpay_url", async (req, res) => {
 
     if (bankCode) params.vnp_BankCode = bankCode;
 
-    // SORT KEY
     const sortedKeys = Object.keys(params).sort();
+
     const enc = (v) =>
-      encodeURIComponent(String(v)).replace(/%20/g, "+");
+      encodeURIComponent(String(v)).replace(/%20/g, '+');
 
     const signData = sortedKeys
       .map((k) => `${enc(k)}=${enc(params[k])}`)
-      .join("&");
+      .join('&');
 
-    // HMAC
-    const hmac = crypto.createHmac("sha512", config.vnp_HashSecret);
-    const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
+    const hmac = crypto.createHmac('sha512', vnp_HashSecret);
+    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
-    const paymentUrl =
-      config.vnp_Url + "?" + signData + "&vnp_SecureHash=" + signed;
+    const paymentUrl = `${vnp_Url}?${signData}&vnp_SecureHash=${signed}`;
 
+    // Lưu thêm paymentUrl nếu thích
     intent.paymentUrl = paymentUrl;
-    intent.secureHash = signed;
     await intent.save();
 
     return res.json({
       ok: true,
       paymentUrl,
-      orderId,
+      orderId: bookingId,          // để FE kiểm tra lại booking
       intentId: intent._id,
       amount,
-      createDate: createDate.toISOString(),
-      expireDate: expireDate.toISOString(),
+      createDate: now.toDate().toISOString(),
+      expireDate: expiresAt.toISOString(),
     });
   } catch (err) {
-    console.error("create_vnpay_url error:", err);
-    return res.status(500).json({ ok: false, message: "Lỗi tạo link VNPay" });
+    console.error('create_vnpay_url error:', err);
+    return res.status(500).json({
+      ok: false,
+      message: 'Lỗi tạo link VNPay',
+    });
   }
 });
 
