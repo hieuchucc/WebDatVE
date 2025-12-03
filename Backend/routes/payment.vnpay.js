@@ -3,6 +3,7 @@ const crypto = require('crypto');
 require('dotenv').config();
 
 const router = express.Router();
+const moment = require('moment-timezone');
 
 // env
 const VNP_TMN = process.env.VNP_TMNCODE;
@@ -37,86 +38,124 @@ function formatDateVN(date) {
 }
 
 /* ================== 1. TẠO LINK THANH TOÁN ================== */
-router.post('/create_vnpay_url', async function (req, res) {
+router.post('/create_vnpay_url', async (req, res) => {
   try {
-    // Lấy IP client (ES5 style)
-    var xfwd = (req.headers['x-forwarded-for'] || '').toString();
-    var ipAddr = '127.0.0.1';
+    const clientIp =
+      req.headers['x-forwarded-for'] ||
+      req.socket?.remoteAddress ||
+      '127.0.0.1';
 
-    if (xfwd) {
-      ipAddr = xfwd.split(',')[0].trim();
-    } else if (req.connection && req.connection.remoteAddress) {
-      ipAddr = req.connection.remoteAddress;
-    } else if (req.socket && req.socket.remoteAddress) {
-      ipAddr = req.socket.remoteAddress;
-    } else if (req.connection && req.connection.socket && req.connection.socket.remoteAddress) {
-      ipAddr = req.connection.socket.remoteAddress;
-    }
+    const {
+      amount: amountInput,
+      orderId: orderIdInput,
+      orderInfo,
+      bankCode,
+    } = req.body || {};
 
-    if (ipAddr === '::1') ipAddr = '127.0.0.1';
+    // 🔥 LẤY THỜI GIAN THEO MÚI GIỜ VIỆT NAM
+    const now = moment().tz('Asia/Ho_Chi_Minh');
+    const createDate = now.toDate(); // Date để lưu DB
+    const expireDate = now.clone().add(15, 'minutes').toDate(); // +15 phút
 
-    var body = req.body || {};
-    var amount = body.amount; // VND
-    var orderId = body.orderId; // booking._id mà /confirm trả về
-    var orderInfo = body.orderInfo;
-    var bankCode = body.bankCode;
+    // Chuỗi thời gian theo format VNPay yêu cầu: yyyyMMddHHmmss
+    const vnpCreateDate = now.format('YYYYMMDDHHmmss');
+    const vnpExpireDate = now.clone().add(15, 'minutes').format('YYYYMMDDHHmmss');
 
-    var vnpAmount = Math.round(Number(amount || 0)) * 100;
-    if (!vnpAmount || !orderId) {
-      return res.status(400).json({ message: 'Thiếu amount/orderId' });
-    }
+    // Mã đơn hàng
+    const orderId =
+      (orderIdInput ||
+        (createDate.getTime() + '-' + Math.floor(Math.random() * 1000))
+      ).toString();
 
-    // TxnRef phải sạch ký tự
-    var vnpTxnRef = String(orderId).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
+    // Số tiền (VNĐ)
+    const amount = amountInput ? Number(amountInput) : 10000;
 
-    // Tập params để ký
-    var params = {
-      vnp_Version: '2.1.0',
+    // ============== TẠO PAYMENT INTENT LƯU DB ==============
+    const intent = await PaymentIntent.create({
+      provider: 'vnpay',
+      orderId,
+      amount,
+      currency: 'VND',
+      status: 'pending',
+      clientIp,
+      meta: {
+        bankCode: bankCode || null,
+        orderInfo: orderInfo || '',
+      },
+      createDate, // Date chuẩn VN (nhưng thực tế lúc lưu Mongo vẫn là UTC)
+      expireDate,
+    });
+
+    // ============== BUILD PARAMS GỬI VNPay ==============
+    const config = req.app.get('vnpayConfig');
+    const vnpUrl = config.vnp_Url;
+    const returnUrl = config.vnp_ReturnUrl;
+
+    const params = {
+      vnp_Version: config.vnp_Version,
       vnp_Command: 'pay',
-      vnp_TmnCode: VNP_TMN,
-      vnp_Amount: vnpAmount,
-      vnp_CurrCode: 'VND',
-      vnp_TxnRef: vnpTxnRef,
-      vnp_OrderInfo: orderInfo || 'Thanh toan ' + vnpTxnRef,
-      vnp_OrderType: 'billpayment',
+      vnp_TmnCode: config.vnp_TmnCode,
       vnp_Locale: 'vn',
-      vnp_ReturnUrl: VNP_RETURNURL,
-      vnp_IpAddr: ipAddr,
-      vnp_CreateDate: formatDateVN(new Date()),
-      vnp_ExpireDate: formatDateVN(new Date(Date.now() + 15 * 60 * 1000)),
+      vnp_CurrCode: 'VND',
+      vnp_TxnRef: orderId,
+      vnp_OrderInfo: orderInfo || `Thanh toan ve xe #${orderId}`,
+      vnp_OrderType: 'other',
+      vnp_Amount: amount * 100, // nhân 100 theo chuẩn VNPay
+      vnp_ReturnUrl: returnUrl,
+      vnp_IpAddr: clientIp,
+      vnp_CreateDate: vnpCreateDate,
+      vnp_ExpireDate: vnpExpireDate,
     };
 
     if (bankCode) params.vnp_BankCode = bankCode;
 
     // Sắp xếp key
-    var sortedKeys = Object.keys(params).sort();
+    const sortedKeys = Object.keys(params).sort();
 
     function enc(v) {
       return encodeURIComponent(String(v)).replace(/%20/g, '+');
     }
 
-    // chuỗi để ký
-    var signDataArr = [];
-    for (var i = 0; i < sortedKeys.length; i++) {
-      var k = sortedKeys[i];
-      signDataArr.push(k + '=' + enc(params[k]));
-    }
-    var signData = signDataArr.join('&');
+    // Chuỗi rawData
+    const signData = sortedKeys
+      .map((k) => `${enc(k)}=${enc(params[k])}`)
+      .join('&');
 
-    // tạo chữ ký
-    var vnp_SecureHash = crypto.createHmac('sha512', VNP_SECRET).update(Buffer.from(signData, 'utf8')).digest('hex');
+    // Tạo secure hash
+    const hmac = crypto.createHmac('sha512', config.vnp_HashSecret);
+    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
-    // query gửi đi
-    var queryToSend = signData + '&vnp_SecureHashType=HMACSHA512&vnp_SecureHash=' + vnp_SecureHash;
+    // Build URL cuối cùng
+    const paymentUrl =
+      vnpUrl +
+      '?' +
+      signData +
+      '&vnp_SecureHash=' +
+      signed;
 
-    var paymentUrl = VNP_URL + '?' + queryToSend;
+    // Lưu url + secure hash vào intent
+    intent.paymentUrl = paymentUrl;
+    intent.secureHash = signed;
+    await intent.save();
 
-    return res.json({ paymentUrl: paymentUrl });
+    return res.json({
+      ok: true,
+      paymentUrl,
+      orderId,
+      intentId: intent._id,
+      amount,
+      createDate: createDate.toISOString(),
+      expireDate: expireDate.toISOString(),
+    });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Server error tạo VNPay URL' });
+    console.error('create_vnpay_url error:', err);
+    return res.status(500).json({
+      ok: false,
+      message: 'Lỗi tạo link VNPay',
+    });
   }
 });
+
 
 /* =============== HÀM PHỤ: chốt ghế & huỷ hold =============== */
 async function confirmSeatFromBooking(booking) {
