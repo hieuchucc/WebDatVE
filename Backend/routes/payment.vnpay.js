@@ -49,33 +49,39 @@ router.post('/create_vnpay_url', async (req, res) => {
 
     const {
       amount: amountInput,
-      orderId: orderIdInput,
+      orderId: bookingIdInput,   // <-- bookingId gửi từ FE
       orderInfo,
       bankCode,
     } = req.body || {};
 
     // 🔥 LẤY THỜI GIAN THEO MÚI GIỜ VIỆT NAM
     const now = moment().tz('Asia/Ho_Chi_Minh');
-    const createDate = now.toDate(); // Date để lưu DB
-    const expireDate = now.clone().add(15, 'minutes').toDate(); // +15 phút
-
-    // Chuỗi thời gian theo format VNPay yêu cầu: yyyyMMddHHmmss
+    const createDate = now.toDate();                         // Date để lưu / trả về
+    const expiresAt = now.clone().add(15, 'minutes').toDate(); // <-- dùng cho schema
     const vnpCreateDate = now.format('YYYYMMDDHHmmss');
     const vnpExpireDate = now.clone().add(15, 'minutes').format('YYYYMMDDHHmmss');
 
-    // Mã đơn hàng
-    const orderId =
-      (orderIdInput ||
-        (createDate.getTime() + '-' + Math.floor(Math.random() * 1000))
-      ).toString();
+    // bookingId là _id của Booking (FE gửi qua = orderId)
+    if (!bookingIdInput) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Thiếu bookingId (orderId) từ client',
+      });
+    }
+    const bookingId = bookingIdInput.toString();
+
+    // orderId để gửi sang VNPay, có thể dùng luôn bookingId
+    const orderId = bookingId;
 
     // Số tiền (VNĐ)
     const amount = amountInput ? Number(amountInput) : 10000;
 
     // ============== TẠO PAYMENT INTENT LƯU DB ==============
     const intent = await PaymentIntent.create({
-      provider: 'vnpay',
-      orderId,
+      bookingId,          // ✅ REQUIRED
+      method: 'vnpay',    // ✅ REQUIRED
+      provider: 'vnpay',  // tuỳ schema, không required thì cũng ok
+      orderId,            // nếu trong schema có field này
       amount,
       currency: 'VND',
       status: 'pending',
@@ -84,8 +90,7 @@ router.post('/create_vnpay_url', async (req, res) => {
         bankCode: bankCode || null,
         orderInfo: orderInfo || '',
       },
-      createDate, // Date chuẩn VN (nhưng thực tế lúc lưu Mongo vẫn là UTC)
-      expireDate,
+      expiresAt,          // ✅ REQUIRED (schema đang đòi cái này)
     });
 
     // ============== BUILD PARAMS GỬI VNPay ==============
@@ -99,7 +104,7 @@ router.post('/create_vnpay_url', async (req, res) => {
       vnp_TmnCode: config.vnp_TmnCode,
       vnp_Locale: 'vn',
       vnp_CurrCode: 'VND',
-      vnp_TxnRef: orderId,
+      vnp_TxnRef: orderId, // dùng bookingId làm mã đơn hàng
       vnp_OrderInfo: orderInfo || `Thanh toan ve xe #${orderId}`,
       vnp_OrderType: 'other',
       vnp_Amount: amount * 100, // nhân 100 theo chuẩn VNPay
@@ -111,31 +116,22 @@ router.post('/create_vnpay_url', async (req, res) => {
 
     if (bankCode) params.vnp_BankCode = bankCode;
 
-    // Sắp xếp key
     const sortedKeys = Object.keys(params).sort();
 
     function enc(v) {
       return encodeURIComponent(String(v)).replace(/%20/g, '+');
     }
 
-    // Chuỗi rawData
     const signData = sortedKeys
       .map((k) => `${enc(k)}=${enc(params[k])}`)
       .join('&');
 
-    // Tạo secure hash
     const hmac = crypto.createHmac('sha512', config.vnp_HashSecret);
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
-    // Build URL cuối cùng
-    const paymentUrl =
-      vnpUrl +
-      '?' +
-      signData +
-      '&vnp_SecureHash=' +
-      signed;
+    const paymentUrl = vnpUrl + '?' + signData + '&vnp_SecureHash=' + signed;
 
-    // Lưu url + secure hash vào intent
+    // Lưu url + secure hash vào intent (nếu schema có 2 field này)
     intent.paymentUrl = paymentUrl;
     intent.secureHash = signed;
     await intent.save();
@@ -147,7 +143,7 @@ router.post('/create_vnpay_url', async (req, res) => {
       intentId: intent._id,
       amount,
       createDate: createDate.toISOString(),
-      expireDate: expireDate.toISOString(),
+      expireDate: vnpExpireDate, // hoặc expiresAt.toISOString(), tuỳ mày
     });
   } catch (err) {
     console.error('create_vnpay_url error:', err);
