@@ -6,10 +6,26 @@ const router = express.Router();
 const moment = require('moment-timezone');
 
 // env
-const VNP_TMN = process.env.VNP_TMNCODE;
-const VNP_SECRET = process.env.VNP_HASHSECRET;
-const VNP_URL = process.env.VNP_URL;
-const VNP_RETURNURL = process.env.VNP_RETURNURL;
+const appConfig = req.app.get('vnpayConfig') || {};
+
+const vnp_Url       = appConfig.vnp_Url       || process.env.VNP_URL;
+const vnp_ReturnUrl = appConfig.vnp_ReturnUrl || process.env.VNP_RETURN_URL;
+const vnp_TmnCode   = appConfig.vnp_TmnCode   || process.env.VNP_TMN_CODE;
+const vnp_HashSecret= appConfig.vnp_HashSecret|| process.env.VNP_HASH_SECRET;
+
+// Nếu thiếu bất kỳ cái nào → báo lỗi rõ ràng, khỏi cho crypto chạy
+if (!vnp_Url || !vnp_ReturnUrl || !vnp_TmnCode || !vnp_HashSecret) {
+  console.error('VNPay config missing:', {
+    vnp_Url,
+    vnp_ReturnUrl,
+    vnp_TmnCode,
+    vnp_HashSecret: vnp_HashSecret ? '***' : undefined,
+  });
+  return res.status(500).json({
+    ok: false,
+    message: 'VNPay config chưa cấu hình đầy đủ trên server (URL / TMN / HASH / RETURN_URL).',
+  });
+}
 
 // ===== FE base & pages =====
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://127.0.0.1:5500';
@@ -38,13 +54,6 @@ function formatDateVN(date) {
     pad(date.getSeconds())
   );
 }
-const VNPAY_CONFIG_FALLBACK = {
-  vnp_Url: process.env.VNP_URL,
-  vnp_ReturnUrl: process.env.VNP_RETURNURL,
-  vnp_TmnCode: process.env.VNP_TMNCODE,
-  vnp_HashSecret: process.env.VNP_HASHSECRET,
-  vnp_Version: process.env.VNP_VERSION || "2.1.0",
-};
 
 /* ================== 1. TẠO LINK THANH TOÁN ================== */
 router.post('/create_vnpay_url', async (req, res) => {
