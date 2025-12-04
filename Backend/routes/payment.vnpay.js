@@ -1,14 +1,14 @@
 const express = require('express');
 const crypto = require('crypto');
 const moment = require('moment-timezone');
+const querystring = require('querystring');
 require('dotenv').config();
 
 const router = express.Router();
-const querystring = require('querystring');
 
 /* ================== 0. VNPay ENV CONFIG ================== */
 /**
- * Trên Render bạn đang để:
+ * Render env:
  *  - VNP_HASHSECRET
  *  - VNP_RETURNURL
  *  - VNP_TMNCODE
@@ -25,7 +25,7 @@ const {
   FRONTEND_URL = 'http://127.0.0.1:5500',
 } = process.env;
 
-// alias cho dễ dùng trong code
+// alias
 const VNP_RETURN_URL = VNP_RETURNURL;
 const VNP_TMN_CODE = VNP_TMNCODE;
 const VNP_HASH_SECRET = VNP_HASHSECRET;
@@ -101,10 +101,23 @@ router.post('/create_vnpay_url', async (req, res) => {
   try {
     if (!ensureVnpConfig(req, res)) return;
 
-    const clientIp =
+    // ---- Chuẩn hoá IP client (Render thường nhiều IP, IPv6,...) ----
+    let clientIp =
       req.headers['x-forwarded-for'] ||
+      req.connection?.remoteAddress ||
       req.socket?.remoteAddress ||
+      (req.ip ? req.ip : '') ||
       '127.0.0.1';
+
+    if (clientIp.includes(',')) {
+      clientIp = clientIp.split(',')[0].trim();
+    }
+    if (clientIp.startsWith('::ffff:')) {
+      clientIp = clientIp.substring(7);
+    }
+    if (!clientIp || clientIp === '::1') {
+      clientIp = '127.0.0.1';
+    }
 
     const {
       amount: amountInput,
@@ -134,7 +147,7 @@ router.post('/create_vnpay_url', async (req, res) => {
     // Cho vnp_TxnRef = bookingId cho dễ mapping
     const txnRef = bookingId;
 
-    // Tạo PaymentIntent
+    // ============== TẠO PAYMENT INTENT LƯU DB ==============
     const intent = await PaymentIntent.create({
       bookingId,
       method: 'vnpay',
@@ -145,7 +158,7 @@ router.post('/create_vnpay_url', async (req, res) => {
       providerTxnId: txnRef,
     });
 
-    // ====== BUILD PARAMS VNPay ======
+    // ============== BUILD PARAMS GỬI VNPay ==============
     let vnp_Params = {
       vnp_Version: '2.1.0',
       vnp_Command: 'pay',
@@ -155,7 +168,7 @@ router.post('/create_vnpay_url', async (req, res) => {
       vnp_TxnRef: txnRef,
       vnp_OrderInfo: orderInfo || `Thanh toan ve xe #${bookingId}`,
       vnp_OrderType: 'other',
-      vnp_Amount: amount * 100,
+      vnp_Amount: amount * 100, // VNPay yêu cầu nhân 100
       vnp_ReturnUrl: VNP_RETURN_URL,
       vnp_IpAddr: clientIp,
       vnp_CreateDate: vnpCreateDate,
@@ -169,7 +182,7 @@ router.post('/create_vnpay_url', async (req, res) => {
       vnp_Params.vnp_BankCode = bankCode;
     }
 
-    // ====== SORT PARAMS Y CHANG SAMPLE VNPay ======
+    // ====== SORT PARAMS (giống sample VNPay) ======
     const sorted = {};
     Object.keys(vnp_Params)
       .sort()
@@ -178,7 +191,9 @@ router.post('/create_vnpay_url', async (req, res) => {
       });
 
     // Chuỗi để ký: KHÔNG encode
-    const signData = querystring.stringify(sorted, { encode: false });
+    const signData = Object.keys(sorted)
+      .map((key) => `${key}=${sorted[key]}`)
+      .join('&');
 
     console.log(
       'VNP_HASH_SECRET in runtime =',
@@ -197,12 +212,11 @@ router.post('/create_vnpay_url', async (req, res) => {
 
     // Gán chữ ký vào param
     sorted.vnp_SecureHash = signed;
-    // (tuỳ, nhiều sample không gửi vnp_SecureHashType, VNPay vẫn chạy)
-    // sorted.vnp_SecureHashType = 'HMACSHA512';
+    // sorted.vnp_SecureHashType = 'HMACSHA512'; // nếu portal yêu cầu thì mở
 
-    // Build URL: LÚC NÀY MỚI encode
+    // Build URL: lúc này mới encode
     const paymentUrl =
-      VNP_URL + '?' + querystring.stringify(sorted, { encode: true });
+      VNP_URL + '?' + querystring.stringify(sorted); // mặc định encode đúng
 
     console.log('VNPay URL:', paymentUrl);
 
@@ -227,7 +241,6 @@ router.post('/create_vnpay_url', async (req, res) => {
   }
 });
 
-
 /* ================== 2. RETURN URL ================== */
 router.get('/vnpay_return', async (req, res) => {
   try {
@@ -236,17 +249,23 @@ router.get('/vnpay_return', async (req, res) => {
     let vnp_Params = req.query || {};
     const vnp_SecureHash = vnp_Params.vnp_SecureHash;
 
-    // bỏ 2 param để ký lại
+    // loại bỏ 2 param hash
     const paramsForSign = {};
     Object.keys(vnp_Params).forEach((k) => {
-      if (k !== 'vnp_SecureHash' && k !== 'vnp_SecureHashType')
+      if (k !== 'vnp_SecureHash' && k !== 'vnp_SecureHashType') {
         paramsForSign[k] = vnp_Params[k];
+      }
     });
 
-    const sortedKeys = Object.keys(paramsForSign).sort();
-    const enc = (v) => encodeURIComponent(String(v)).replace(/%20/g, '+');
-    const signData = sortedKeys
-      .map((k) => k + '=' + enc(paramsForSign[k]))
+    const sorted = {};
+    Object.keys(paramsForSign)
+      .sort()
+      .forEach((key) => {
+        sorted[key] = paramsForSign[key];
+      });
+
+    const signData = Object.keys(sorted)
+      .map((key) => `${key}=${sorted[key]}`)
       .join('&');
 
     const checkHash = crypto
@@ -272,7 +291,6 @@ router.get('/vnpay_return', async (req, res) => {
     const rspCode = vnp_Params.vnp_ResponseCode;
 
     if (rspCode === '00') {
-      // thanh toán thành công
       let booking = await Booking.findByIdAndUpdate(
         bookingId,
         {
@@ -305,7 +323,6 @@ router.get('/vnpay_return', async (req, res) => {
         `${FRONTEND_SUCCESS}?orderId=${bookingId}&amount=${amount}&bank=${bankCode}&payDate=${payDate}`
       );
     } else {
-      // thanh toán fail
       await Booking.findByIdAndUpdate(bookingId, {
         $set: { 'payment.status': 'failed' },
       });
@@ -332,14 +349,20 @@ router.get('/vnpay_ipn', async (req, res) => {
 
     const paramsForSign = {};
     Object.keys(vnp_Params).forEach((k) => {
-      if (k !== 'vnp_SecureHash' && k !== 'vnp_SecureHashType')
+      if (k !== 'vnp_SecureHash' && k !== 'vnp_SecureHashType') {
         paramsForSign[k] = vnp_Params[k];
+      }
     });
 
-    const sortedKeys = Object.keys(paramsForSign).sort();
-    const enc = (v) => encodeURIComponent(String(v)).replace(/%20/g, '+');
-    const signData = sortedKeys
-      .map((k) => k + '=' + enc(paramsForSign[k]))
+    const sorted = {};
+    Object.keys(paramsForSign)
+      .sort()
+      .forEach((key) => {
+        sorted[key] = paramsForSign[key];
+      });
+
+    const signData = Object.keys(sorted)
+      .map((key) => `${key}=${sorted[key]}`)
       .join('&');
 
     const checkHash = crypto
