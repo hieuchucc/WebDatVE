@@ -5,14 +5,30 @@ require('dotenv').config();
 
 const router = express.Router();
 
-// ===== VNPay config từ ENV =====
+/* ================== 0. VNPay ENV CONFIG ================== */
+/**
+ * Trên Render bạn đang để:
+ *  - VNP_HASHSECRET
+ *  - VNP_RETURNURL
+ *  - VNP_TMNCODE
+ *  - VNP_URL
+ *  - VNP_IPNURL
+ */
+
 const {
   VNP_URL,
-  VNP_RETURN_URL,
-  VNP_TMN_CODE,
-  VNP_HASH_SECRET,
+  VNP_RETURNURL,
+  VNP_TMNCODE,
+  VNP_HASHSECRET,
+  VNP_IPNURL,
   FRONTEND_URL = 'http://127.0.0.1:5500',
 } = process.env;
+
+// alias cho dễ dùng trong code
+const VNP_RETURN_URL = VNP_RETURNURL;
+const VNP_TMN_CODE = VNP_TMNCODE;
+const VNP_HASH_SECRET = VNP_HASHSECRET;
+const VNP_IPN_URL = VNP_IPNURL;
 
 const FRONTEND_SUCCESS = `${FRONTEND_URL}/payment-success.html`;
 const FRONTEND_FAIL = `${FRONTEND_URL}/payment-fail.html`;
@@ -43,7 +59,7 @@ function ensureVnpConfig(req, res) {
   return true;
 }
 
-// ========= Helper: chốt ghế & huỷ hold =========
+/* =============== HÀM PHỤ: chốt ghế & huỷ hold =============== */
 async function confirmSeatFromBooking(booking) {
   try {
     if (!booking) return;
@@ -103,19 +119,22 @@ router.post('/create_vnpay_url', async (req, res) => {
       });
     }
 
+    // Thời gian theo giờ VN
     const now = moment().tz('Asia/Ho_Chi_Minh');
-    const expiresAt = now.clone().add(15, 'minutes').toDate();
+    const expiresAt = now.clone().add(15, 'minutes').toDate(); // dùng cho PaymentIntent
     const vnpCreateDate = now.format('YYYYMMDDHHmmss');
     const vnpExpireDate = now
       .clone()
       .add(15, 'minutes')
       .format('YYYYMMDDHHmmss');
 
+    // Số tiền
     const amount = amountInput ? Number(amountInput) : 10000;
 
     // Ở đây cho vnp_TxnRef = bookingId cho dễ mapping
     const txnRef = bookingId;
 
+    // ============== TẠO PAYMENT INTENT LƯU DB ==============
     const intent = await PaymentIntent.create({
       bookingId,
       method: 'vnpay',
@@ -126,6 +145,7 @@ router.post('/create_vnpay_url', async (req, res) => {
       providerTxnId: txnRef,
     });
 
+    // ============== BUILD PARAMS GỬI VNPay ==============
     const params = {
       vnp_Version: '2.1.0',
       vnp_Command: 'pay',
@@ -135,17 +155,23 @@ router.post('/create_vnpay_url', async (req, res) => {
       vnp_TxnRef: txnRef,
       vnp_OrderInfo: orderInfo || `Thanh toan ve xe #${bookingId}`,
       vnp_OrderType: 'other',
-      vnp_Amount: amount * 100,
+      vnp_Amount: amount * 100, // VNPay yêu cầu nhân 100
       vnp_ReturnUrl: VNP_RETURN_URL,
       vnp_IpAddr: clientIp,
       vnp_CreateDate: vnpCreateDate,
       vnp_ExpireDate: vnpExpireDate,
     };
 
+    // Nếu bạn muốn dùng IpnUrl theo env (optional của VNPay)
+    if (VNP_IPN_URL) {
+      params.vnp_IpnUrl = VNP_IPN_URL;
+    }
+
     if (bankCode) params.vnp_BankCode = bankCode;
 
     const sortedKeys = Object.keys(params).sort();
-    const enc = (v) => encodeURIComponent(String(v)).replace(/%20/g, '+');
+    const enc = (v) =>
+      encodeURIComponent(String(v)).replace(/%20/g, '+');
 
     const signData = sortedKeys
       .map((k) => `${enc(k)}=${enc(params[k])}`)
@@ -159,7 +185,7 @@ router.post('/create_vnpay_url', async (req, res) => {
     if (!VNP_HASH_SECRET) {
       return res.status(500).json({
         ok: false,
-        message: 'VNPay secret chưa cấu hình (VNP_HASH_SECRET).',
+        message: 'VNPay secret chưa cấu hình (VNP_HASHSECRET).',
       });
     }
 
@@ -199,6 +225,7 @@ router.get('/vnpay_return', async (req, res) => {
     let vnp_Params = req.query || {};
     const vnp_SecureHash = vnp_Params.vnp_SecureHash;
 
+    // bỏ 2 param để ký lại
     const paramsForSign = {};
     Object.keys(vnp_Params).forEach((k) => {
       if (k !== 'vnp_SecureHash' && k !== 'vnp_SecureHashType')
@@ -216,7 +243,7 @@ router.get('/vnpay_return', async (req, res) => {
       .update(Buffer.from(signData, 'utf8'))
       .digest('hex');
 
-    const bookingId = vnp_Params.vnp_TxnRef;
+    const bookingId = vnp_Params.vnp_TxnRef; // = bookingId vì ở trên mình set vậy
     const amount = vnp_Params.vnp_Amount
       ? Number(vnp_Params.vnp_Amount) / 100
       : 0;
@@ -234,6 +261,7 @@ router.get('/vnpay_return', async (req, res) => {
     const rspCode = vnp_Params.vnp_ResponseCode;
 
     if (rspCode === '00') {
+      // thanh toán thành công
       let booking = await Booking.findByIdAndUpdate(
         bookingId,
         {
@@ -266,6 +294,7 @@ router.get('/vnpay_return', async (req, res) => {
         `${FRONTEND_SUCCESS}?orderId=${bookingId}&amount=${amount}&bank=${bankCode}&payDate=${payDate}`
       );
     } else {
+      // thanh toán fail
       await Booking.findByIdAndUpdate(bookingId, {
         $set: { 'payment.status': 'failed' },
       });
