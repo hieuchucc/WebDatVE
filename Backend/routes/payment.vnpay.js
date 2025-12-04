@@ -175,9 +175,6 @@ router.post('/create_vnpay_url', async (req, res) => {
       vnp_ExpireDate: vnpExpireDate,
     };
 
-    if (VNP_IPN_URL) {
-      vnp_Params.vnp_IpnUrl = VNP_IPN_URL;
-    }
     if (bankCode) {
       vnp_Params.vnp_BankCode = bankCode;
     }
