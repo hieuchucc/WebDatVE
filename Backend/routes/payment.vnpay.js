@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const router = express.Router();
 
-console.log('payment.vnpay.js LOADED v5');
+console.log('payment.vnpay.js LOADED v6');
 
 /* ================== 0. VNPay ENV CONFIG ================== */
 /**
@@ -25,10 +25,10 @@ const {
   FRONTEND_URL = 'http://127.0.0.1:5500',
 } = process.env;
 
-// alias
+// alias + trim secret để tránh lỗi dính space
 const VNP_RETURN_URL = VNP_RETURNURL;
 const VNP_TMN_CODE = VNP_TMNCODE;
-const VNP_HASH_SECRET = VNP_HASHSECRET;
+const VNP_HASH_SECRET = (VNP_HASHSECRET || '').trim();
 
 const FRONTEND_SUCCESS = `${FRONTEND_URL}/payment-success.html`;
 const FRONTEND_FAIL = `${FRONTEND_URL}/payment-fail.html`;
@@ -39,6 +39,16 @@ const { Hold } = require('../models/Hold');
 const { Trip } = require('../models/Trip');
 const { PaymentIntent } = require('../models/PaymentIntent');
 const { sendTicketPaidEmail } = require('../services/mailer');
+
+/* ===== Helper sort object theo đúng mẫu VNPay ===== */
+function sortObject(obj) {
+  const sorted = {};
+  const keys = Object.keys(obj).sort();
+  keys.forEach((key) => {
+    sorted[key] = encodeURIComponent(obj[key]).replace(/%20/g, '+');
+  });
+  return sorted;
+}
 
 // ========= Helper: check config VNPay =========
 function ensureVnpConfig(req, res) {
@@ -178,19 +188,13 @@ router.post('/create_vnpay_url', async (req, res) => {
       vnp_Params.vnp_BankCode = bankCode;
     }
 
-    // ====== SORT PARAMS (giống sample VNPay) ======
-    const sorted = {};
-    Object.keys(vnp_Params)
-      .sort()
-      .forEach((key) => {
-        sorted[key] = vnp_Params[key];
-      });
+    // Sort + encode value theo mẫu VNPay
+    vnp_Params = sortObject(vnp_Params);
 
-    console.log('vnp_Params keys =', Object.keys(sorted));
+    // Chuỗi để ký
+    const signData = querystring.stringify(vnp_Params, { encode: false });
 
-    // Chuỗi để ký: dùng querystring.stringify với encode=false (theo sample VNPay)
-    const signData = querystring.stringify(sorted, { encode: false });
-
+    console.log('create_vnpay_url signData =', signData);
     console.log(
       'VNP_HASH_SECRET in runtime =',
       VNP_HASH_SECRET ? '***' : 'undefined'
@@ -207,12 +211,12 @@ router.post('/create_vnpay_url', async (req, res) => {
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
     // Gán chữ ký vào param
-    sorted.vnp_SecureHash = signed;
-    // sorted.vnp_SecureHashType = 'HMACSHA512'; // nếu portal yêu cầu thì mở
+    vnp_Params.vnp_SecureHash = signed;
+    // vnp_Params.vnp_SecureHashType = 'HMACSHA512'; // nếu portal yêu cầu thì mở
 
-    // Build URL: lúc này mới encode (encode=true mặc định)
+    // Build URL: các value đã encode rồi nên encode=false
     const paymentUrl =
-      VNP_URL + '?' + querystring.stringify(sorted);
+      VNP_URL + '?' + querystring.stringify(vnp_Params, { encode: false });
 
     console.log('VNPay URL:', paymentUrl);
 
@@ -246,29 +250,19 @@ router.get('/vnpay_return', async (req, res) => {
     const vnp_SecureHash = vnp_Params.vnp_SecureHash;
 
     // loại bỏ 2 param hash
-    const paramsForSign = {};
-    Object.keys(vnp_Params).forEach((k) => {
-      if (k !== 'vnp_SecureHash' && k !== 'vnp_SecureHashType') {
-        paramsForSign[k] = vnp_Params[k];
-      }
-    });
+    delete vnp_Params.vnp_SecureHash;
+    delete vnp_Params.vnp_SecureHashType;
 
-    const sorted = {};
-    Object.keys(paramsForSign)
-      .sort()
-      .forEach((key) => {
-        sorted[key] = paramsForSign[key];
-      });
+    vnp_Params = sortObject(vnp_Params);
 
-    // Chuỗi để ký: cũng dùng querystring.stringify với encode=false
-    const signData = querystring.stringify(sorted, { encode: false });
+    const signData = querystring.stringify(vnp_Params, { encode: false });
 
     const checkHash = crypto
       .createHmac('sha512', VNP_HASH_SECRET)
       .update(Buffer.from(signData, 'utf8'))
       .digest('hex');
 
-    const bookingId = vnp_Params.vnp_TxnRef; // = bookingId vì ở trên mình set vậy
+    const bookingId = vnp_Params.vnp_TxnRef; // do sortObject vẫn giữ nguyên value
     const amount = vnp_Params.vnp_Amount
       ? Number(vnp_Params.vnp_Amount) / 100
       : 0;
@@ -347,21 +341,12 @@ router.get('/vnpay_ipn', async (req, res) => {
     let vnp_Params = req.query || {};
     const vnp_SecureHash = vnp_Params.vnp_SecureHash;
 
-    const paramsForSign = {};
-    Object.keys(vnp_Params).forEach((k) => {
-      if (k !== 'vnp_SecureHash' && k !== 'vnp_SecureHashType') {
-        paramsForSign[k] = vnp_Params[k];
-      }
-    });
+    delete vnp_Params.vnp_SecureHash;
+    delete vnp_Params.vnp_SecureHashType;
 
-    const sorted = {};
-    Object.keys(paramsForSign)
-      .sort()
-      .forEach((key) => {
-        sorted[key] = paramsForSign[key];
-      });
+    vnp_Params = sortObject(vnp_Params);
 
-    const signData = querystring.stringify(sorted, { encode: false });
+    const signData = querystring.stringify(vnp_Params, { encode: false });
 
     const checkHash = crypto
       .createHmac('sha512', VNP_HASH_SECRET)
