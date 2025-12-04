@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const router = express.Router();
 
-console.log('payment.vnpay.js LOADED v4');
+console.log('payment.vnpay.js LOADED v5');
 
 /* ================== 0. VNPay ENV CONFIG ================== */
 /**
@@ -188,10 +188,8 @@ router.post('/create_vnpay_url', async (req, res) => {
 
     console.log('vnp_Params keys =', Object.keys(sorted));
 
-    // Chuỗi để ký: KHÔNG encode
-    const signData = Object.keys(sorted)
-      .map((key) => `${key}=${sorted[key]}`)
-      .join('&');
+    // Chuỗi để ký: dùng querystring.stringify với encode=false (theo sample VNPay)
+    const signData = querystring.stringify(sorted, { encode: false });
 
     console.log(
       'VNP_HASH_SECRET in runtime =',
@@ -212,9 +210,9 @@ router.post('/create_vnpay_url', async (req, res) => {
     sorted.vnp_SecureHash = signed;
     // sorted.vnp_SecureHashType = 'HMACSHA512'; // nếu portal yêu cầu thì mở
 
-    // Build URL: lúc này mới encode
+    // Build URL: lúc này mới encode (encode=true mặc định)
     const paymentUrl =
-      VNP_URL + '?' + querystring.stringify(sorted); // mặc định encode đúng
+      VNP_URL + '?' + querystring.stringify(sorted);
 
     console.log('VNPay URL:', paymentUrl);
 
@@ -262,9 +260,8 @@ router.get('/vnpay_return', async (req, res) => {
         sorted[key] = paramsForSign[key];
       });
 
-    const signData = Object.keys(sorted)
-      .map((key) => `${key}=${sorted[key]}`)
-      .join('&');
+    // Chuỗi để ký: cũng dùng querystring.stringify với encode=false
+    const signData = querystring.stringify(sorted, { encode: false });
 
     const checkHash = crypto
       .createHmac('sha512', VNP_HASH_SECRET)
@@ -279,6 +276,11 @@ router.get('/vnpay_return', async (req, res) => {
     const payDate = vnp_Params.vnp_PayDate || '';
 
     if (checkHash !== vnp_SecureHash) {
+      console.error('VNPay RETURN: invalid signature', {
+        signData,
+        vnp_SecureHash,
+        checkHash,
+      });
       return res.redirect(
         `${FRONTEND_FAIL}?orderId=${
           bookingId || 'unknown'
@@ -359,9 +361,7 @@ router.get('/vnpay_ipn', async (req, res) => {
         sorted[key] = paramsForSign[key];
       });
 
-    const signData = Object.keys(sorted)
-      .map((key) => `${key}=${sorted[key]}`)
-      .join('&');
+    const signData = querystring.stringify(sorted, { encode: false });
 
     const checkHash = crypto
       .createHmac('sha512', VNP_HASH_SECRET)
@@ -369,6 +369,11 @@ router.get('/vnpay_ipn', async (req, res) => {
       .digest('hex');
 
     if (checkHash !== vnp_SecureHash) {
+      console.error('VNPay IPN: invalid signature', {
+        signData,
+        vnp_SecureHash,
+        checkHash,
+      });
       return res.json({ RspCode: '97', Message: 'Invalid signature' });
     }
 
