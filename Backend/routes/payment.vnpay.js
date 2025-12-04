@@ -6,6 +6,8 @@ require('dotenv').config();
 
 const router = express.Router();
 
+console.log('payment.vnpay.js LOADED v4');
+
 /* ================== 0. VNPay ENV CONFIG ================== */
 /**
  * Render env:
@@ -13,7 +15,6 @@ const router = express.Router();
  *  - VNP_RETURNURL
  *  - VNP_TMNCODE
  *  - VNP_URL
- *  - VNP_IPNURL
  */
 
 const {
@@ -21,7 +22,6 @@ const {
   VNP_RETURNURL,
   VNP_TMNCODE,
   VNP_HASHSECRET,
-  VNP_IPNURL,
   FRONTEND_URL = 'http://127.0.0.1:5500',
 } = process.env;
 
@@ -29,7 +29,6 @@ const {
 const VNP_RETURN_URL = VNP_RETURNURL;
 const VNP_TMN_CODE = VNP_TMNCODE;
 const VNP_HASH_SECRET = VNP_HASHSECRET;
-const VNP_IPN_URL = VNP_IPNURL;
 
 const FRONTEND_SUCCESS = `${FRONTEND_URL}/payment-success.html`;
 const FRONTEND_FAIL = `${FRONTEND_URL}/payment-fail.html`;
@@ -186,6 +185,8 @@ router.post('/create_vnpay_url', async (req, res) => {
       .forEach((key) => {
         sorted[key] = vnp_Params[key];
       });
+
+    console.log('vnp_Params keys =', Object.keys(sorted));
 
     // Chuỗi để ký: KHÔNG encode
     const signData = Object.keys(sorted)
