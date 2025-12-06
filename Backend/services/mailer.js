@@ -1,112 +1,52 @@
 const nodemailer = require('nodemailer');
-const { Resend } = require('resend');
+require('dotenv').config();
 
-const {
-  SMTP_HOST,
-  SMTP_PORT,
-  SMTP_SECURE,
-  SMTP_USER,
-  SMTP_PASS,
-  MAIL_FROM,
-  RESEND_API_KEY,
-} = process.env;
+/**
+ * Tạo transporter SMTP
+ */
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: process.env.SMTP_SECURE === "true", // "false" => false
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
 
-// ========== RESEND ==========
-let resend = null;
-if (RESEND_API_KEY) {
-  resend = new Resend(RESEND_API_KEY);
-  console.log("[MAIL] Resend initialized ✔");
-}
+/**
+ * Hàm gửi email xác nhận booking
+ */
+async function sendBookingEmail(booking) {
+  const trip = booking.tripId;
 
-// ========== SMTP TRANSPORTER ==========
-let transporter = null;
+  const html = `
+    <h2>📢 Xác nhận thanh toán thành công</h2>
+    <p><strong>Mã đặt vé:</strong> ${booking._id}</p>
 
-if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
-  transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: Number(SMTP_PORT || 587),
-    secure: String(SMTP_SECURE || 'false') === 'true',
-    auth: { user: SMTP_USER, pass: SMTP_PASS },
-    connectionTimeout: 20000,
-    greetingTimeout: 20000,
-    socketTimeout: 20000,
-    requireTLS: true,
-  });
-  console.log("[MAIL] SMTP transporter created ✔");
-} else {
-  console.log("[MAIL] SMTP not configured → will use RESEND fallback");
-}
+    <h3>Thông tin khách hàng</h3>
+    <p><strong>Họ tên:</strong> ${booking.customer.name}</p>
+    <p><strong>SĐT:</strong> ${booking.customer.phone}</p>
+    <p><strong>Email:</strong> ${booking.customer.email}</p>
 
-// ========== TEMPLATES ==========
-function fmtMoney(n) {
-  return Number(n || 0).toLocaleString('vi-VN');
-}
+    <h3>Thông tin chuyến xe</h3>
+    <p><strong>Tuyến:</strong> ${trip.from} → ${trip.to}</p>
+    <p><strong>Khởi hành:</strong> ${new Date(trip.startTime).toLocaleString()}</p>
 
-function ticketPaidHtml(booking) {
-  const trip = booking.trip || booking.tripId || {};
-  const c = booking.customer || {};
-  const seats = (booking.seatCodes || []).join(', ');
+    <h3>Thông tin ghế</h3>
+    <p><strong>Ghế:</strong> ${booking.seatCodes.join(", ")}</p>
 
-  return `
-    <h2>Vé đã thanh toán</h2>
-    <p>Xin chào <b>${c.name}</b></p>
-    <p>Mã đặt vé: <b>${booking._id}</b></p>
-    <p>Tuyến: <b>${trip.routeCode}</b></p>
-    <p>Thời gian: ${trip.dateStr} ${trip.departHM}</p>
-    <p>Ghế: ${seats}</p>
-    <p>Số tiền: <b>${fmtMoney(booking.payment?.amount)} đ</b></p>
+    <h3>Thanh toán</h3>
+    <p><strong>Phương thức:</strong> ${booking.payment.method.toUpperCase()}</p>
+    <p><strong>Số tiền:</strong> ${booking.payment.amount.toLocaleString()} VND</p>
   `;
-}
 
-// ========== CORE SEND MAIL (SMTP → fallback RESEND) ==========
-async function sendMail({ to, subject, html }) {
-  if (!to) return console.warn("[MAIL] Missing email");
-
-  // 1) Try SMTP first if exists
-  if (transporter) {
-    try {
-      const info = await transporter.sendMail({
-        from: MAIL_FROM || SMTP_USER,
-        to,
-        subject,
-        html,
-      });
-      console.log("[MAIL] Sent OK (SMTP):", info.messageId);
-      return info;
-    } catch (err) {
-      console.error("[MAIL] SMTP ERROR:", err.message);
-    }
-  }
-
-  // 2) RESEND fallback
-  if (resend) {
-    try {
-      const res = await resend.emails.send({
-        from: MAIL_FROM,
-        to,
-        subject,
-        html,
-      });
-      console.log("[MAIL] Sent OK (RESEND):", res);
-      return res;
-    } catch (e) {
-      console.error("[MAIL] RESEND ERROR:", e.message);
-    }
-  }
-
-  console.error("[MAIL] FAILED — no SMTP and no RESEND");
-}
-
-// ========== PUBLIC API ==========
-async function sendTicketPaidEmail(booking) {
-  const email = booking.customer?.email;
-  if (!email) return console.log("[MAIL] Booking lacks email");
-
-  return sendMail({
-    to: email,
-    subject: `Vé đã thanh toán - ${booking._id}`,
-    html: ticketPaidHtml(booking),
+  await transporter.sendMail({
+    from: process.env.MAIL_FROM,
+    to: booking.customer.email,
+    subject: "Xác nhận thanh toán vé xe – Thành công!",
+    html
   });
 }
 
-module.exports = { sendTicketPaidEmail };
+module.exports = sendBookingEmail;
