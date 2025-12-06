@@ -42,4 +42,23 @@ router.get('/_test-resend', async (req, res) => {
   }
 });
 
+app.get("/__test-email", async (req, res) => {
+  const { Resend } = require("resend");
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  try {
+    const data = await resend.emails.send({
+      from: process.env.MAIL_FROM,
+      to: "hieuchucc91@gmail.com",
+      subject: "TEST RESEND",
+      html: "<h1>Hello from test</h1>",
+    });
+
+    res.json({ status: "OK", data });
+  } catch (error) {
+    console.log("RESEND ERROR:", error);
+    res.json({ status: "ERROR", error });
+  }
+});
+
 module.exports = router;
