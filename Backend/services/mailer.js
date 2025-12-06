@@ -1,28 +1,21 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-/**
- * Tạo transporter SMTP
- */
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_SECURE === "true", // "false" => false
+  secure: process.env.SMTP_SECURE === "true",
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
   }
 });
 
-/**
- * Hàm gửi email xác nhận booking
- */
-async function sendBookingEmail(booking) {
-  const trip = booking.tripId;
+async function sendTicketPaidEmail(booking) {
+  const trip = booking.trip;
 
   const html = `
-    <h2>📢 Xác nhận thanh toán thành công</h2>
-    <p><strong>Mã đặt vé:</strong> ${booking._id}</p>
+    <h2>📢 Vé xe của bạn đã được thanh toán thành công!</h2>
 
     <h3>Thông tin khách hàng</h3>
     <p><strong>Họ tên:</strong> ${booking.customer.name}</p>
@@ -49,4 +42,4 @@ async function sendBookingEmail(booking) {
   });
 }
 
-module.exports = sendBookingEmail;
+module.exports = { sendTicketPaidEmail };
