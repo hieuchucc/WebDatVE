@@ -1,3 +1,4 @@
+
 const nodemailer = require('nodemailer');
 
 const {
@@ -7,27 +8,31 @@ const {
   SMTP_USER,
   SMTP_PASS,
   MAIL_FROM,
+  SENDGRID_API_KEY, 
 } = process.env;
 
-// ========== Tạo transporter an toàn ==========
-// Chỉ tạo nếu đủ config, tránh tạo bừa rồi ETIMEDOUT
+
 let transporter = null;
 
 if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
   transporter = nodemailer.createTransport({
     host: SMTP_HOST,
     port: Number(SMTP_PORT || 587),
+  
     secure: String(SMTP_SECURE || 'false') === 'true',
     auth: { user: SMTP_USER, pass: SMTP_PASS },
-    // giới hạn timeout để không chờ quá lâu
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+    requireTLS: true,
+    logger: true,   
+    debug: true,    
   });
+  console.log('[MAIL] transporter created (SMTP_HOST set)');
 } else {
   console.warn(
     '[MAIL] SMTP config thiếu (SMTP_HOST / SMTP_USER / SMTP_PASS). ' +
-      'Sẽ không gửi email, chỉ log.'
+      'Sẽ không gửi email, chỉ log. Consider using SENDGRID_API_KEY as fallback.'
   );
 }
 
@@ -59,36 +64,14 @@ function ticketPaidHtml(booking) {
   </div>`;
 }
 
-function departReminderHtml(booking, mins) {
-  const trip = booking.trip || booking.tripId || {};
-  const c = booking.customer || {};
-  const seats = (booking.seatCodes || []).join(', ');
-  return `
-  <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.6">
-    <h3>Nhắc lịch khởi hành 🚌</h3>
-    <p>Chào <b>${c.name || ''}</b>, chuyến <b>${trip.routeCode || '-'}</b> của bạn sẽ khởi hành lúc <b>${
-    trip.dateStr || '-'
-  } ${trip.departHM || ''}</b>.</p>
-    <ul>
-      <li>Mã đặt vé: <b>${booking._id}</b></li>
-      <li>Ghế: <b>${seats || '-'}</b></li>
-    </ul>
-    <p>Đây là email nhắc trước ~${mins} phút. Vui lòng đến bến trước 15–20 phút.</p>
-  </div>`;
-}
-
 async function sendMail({ to, subject, html, attachments }) {
   if (!to) {
     console.warn('[MAIL] sendMail: missing "to" address');
     return;
   }
 
-  // Nếu chưa cấu hình SMTP, không gửi, chỉ log
   if (!transporter) {
-    console.log('[MAIL] SKIP sendMail (no transporter).', {
-      to,
-      subject,
-    });
+    console.log('[MAIL] SKIP sendMail (no transporter). Consider enabling SENDGRID fallback.');
     return;
   }
 
@@ -100,16 +83,21 @@ async function sendMail({ to, subject, html, attachments }) {
       html,
       attachments,
     });
-    console.log('[MAIL] Sent OK:', info.messageId);
+    console.log('[MAIL] Sent OK:', info && info.messageId);
     return info;
   } catch (err) {
-    // 🔥 Quan trọng: nuốt lỗi, không throw ra ngoài nữa
-    console.error('[MAIL] Error sendMail:', err.code || err.message || err);
+    
+    console.error('[MAIL] Error sendMail:', err && (err.code || err.message || err));
+    if (err && err.code === 'ETIMEDOUT') {
+      console.error('[MAIL] ETIMEDOUT — likely outbound SMTP blocked by host (Render may block SMTP).');
+      console.error('[MAIL] Suggestion: Use email-sending service via HTTP API (SendGrid / Mailgun / Postmark).');
+    }
     return null;
   }
 }
 
 async function sendTicketPaidEmail(booking) {
+  console.log('[MAIL] >>> sendTicketPaidEmail called, bookingId =', booking?._id, 'email =', booking?.customer?.email);
   const to = booking.customer?.email;
   if (!to) {
     console.warn('[MAIL] sendTicketPaidEmail: booking không có customer.email');
@@ -123,6 +111,7 @@ async function sendTicketPaidEmail(booking) {
 }
 
 async function sendDepartReminderEmail(booking, mins) {
+  console.log('[MAIL] >>> sendDepartReminderEmail called, bookingId =', booking?._id, 'email =', booking?.customer?.email);
   const to = booking.customer?.email;
   if (!to) {
     console.warn('[MAIL] sendDepartReminderEmail: booking không có customer.email');
@@ -134,6 +123,8 @@ async function sendDepartReminderEmail(booking, mins) {
     html: departReminderHtml(booking, mins),
   });
 }
+
+
 
 module.exports = {
   sendTicketPaidEmail,
