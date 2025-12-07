@@ -8,7 +8,6 @@ async function sendTicketPaidEmail(booking) {
       return;
     }
 
-    // LẤY EMAIL TỪ customer.email
     const email = booking.customer?.email;
     if (!email) {
       console.error("sendTicketPaidEmail: booking.customer.email MISSING", {
@@ -29,20 +28,22 @@ async function sendTicketPaidEmail(booking) {
       <p>Cảm ơn bạn đã đặt vé.</p>
     `;
 
-    const fromAddress =
-      process.env.MAIL_FROM || "bavexetructuyen <onboarding@resend.dev>";
+    const fromAddress = 'bavexnetructuyen <onboarding@resend.dev> ';
+
+    console.log('FROM =', JSON.stringify(fromAddress));
+    console.log('TO   =', JSON.stringify(email));
 
     const result = await resend.emails.send({
       from: fromAddress,
-      to: email, 
-      subject: "Thanh toán thành công",
+      to: email,
+      subject: 'Thanh toán thành công',
       html: htmlContent,
     });
 
-    console.log("Email sent via Resend OK:", result);
+    console.log('Email sent via Resend OK:', result);
   } catch (err) {
     console.error(
-      "Email send error:",
+      'Email send error:',
       err?.response?.data || err?.response?.body || err
     );
   }
