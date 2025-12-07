@@ -28,7 +28,9 @@ async function sendTicketPaidEmail(booking) {
       <p>Cảm ơn bạn đã đặt vé.</p>
     `;
 
-    const fromAddress = 'bavexnetructuyen <onboarding@resend.dev> ';
+    // ❗ KHÔNG để khoảng trắng cuối, và dùng env đúng format
+    const fromAddress =
+      process.env.MAIL_FROM || 'bavextructuyen <onboarding@resend.dev>';
 
     console.log('FROM =', JSON.stringify(fromAddress));
     console.log('TO   =', JSON.stringify(email));
