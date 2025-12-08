@@ -30,7 +30,7 @@ async function sendTicketPaidEmail(booking) {
 
     // ❗ KHÔNG để khoảng trắng cuối, và dùng env đúng format
     const fromAddress =
-      process.env.MAIL_FROM || 'bavextructuyen <onboarding@resend.dev>';
+      process.env.MAIL_FROM || 'bavextructuyen <no-reply@hieuchu.site>';
 
     console.log('FROM =', JSON.stringify(fromAddress));
     console.log('TO   =', JSON.stringify(email));
