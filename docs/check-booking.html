@@ -12,7 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-         :root {
+        :root {
             --primary: #0A5AD7;
             --primary-600: #0C63E7;
             --primary-700: #0847A5;
@@ -32,46 +32,43 @@
             --radius-2xl: 24px;
             --focus-ring: 0 0 0 3px rgba(10, 90, 215, 0.25);
         }
-        
+
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 55%), radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.12), transparent 55%), var(--bg);
+            background:
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 55%),
+                radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.12), transparent 55%),
+                var(--bg);
             color: var(--text);
             font-size: 17px;
-            /* chữ to hơn */
             line-height: 1.6;
         }
+
         /* ==== NAVBAR ==== */
-        /* ==== NAVBAR ==== */
-        
         .booking-navbar {
             position: sticky;
-            /* luôn dính trên đầu khi cuộn */
             top: 0;
             z-index: 1050;
             background: linear-gradient(90deg, #0A5AD7, #0847A5);
-            /* xanh giống trang chủ */
             backdrop-filter: blur(18px);
             box-shadow: 0 1px 0 rgba(15, 23, 42, 0.18);
         }
-        
+
         .booking-navbar {
             height: 60px;
             display: flex;
             align-items: center;
-            /* căn giữa logo + menu theo chiều dọc */
         }
-        
+
         .booking-navbar .navbar-brand {
             display: flex;
             align-items: center;
             gap: .6rem;
             font-weight: 700;
             color: #ffffff;
-            /* chữ trắng cho nổi */
             font-size: 1.1rem;
         }
-        
+
         .booking-navbar .brand-logo {
             width: 36px;
             height: 36px;
@@ -82,31 +79,30 @@
             box-shadow: none;
             background: transparent;
         }
-        
+
         .booking-navbar .brand-text-small {
             font-size: .8rem;
             color: #e5e7eb;
             margin-top: -2px;
         }
-        /* link trên thanh menu */
-        
+
         .booking-navbar .nav-link {
             font-size: 1rem;
             color: #e5efff;
         }
-        
+
         .booking-navbar .nav-link:hover {
             color: #ffffff;
         }
-        
+
         .booking-navbar .nav-link.active {
             color: #ffffff;
             font-weight: 600;
             border-bottom: 2px solid #ffffff;
             border-radius: 0;
         }
+
         /* ==== PAGE LAYOUT ==== */
-        
         .page-wrapper {
             min-height: calc(100vh - 56px);
             display: flex;
@@ -114,7 +110,7 @@
             justify-content: center;
             padding-top: 2.5rem;
         }
-        
+
         .page-card {
             border-radius: var(--radius-2xl);
             background: rgba(255, 255, 255, 0.98);
@@ -122,85 +118,84 @@
             border: 1px solid rgba(148, 163, 184, 0.25);
             padding: 2.4rem 2.1rem 2.6rem;
         }
-        
+
         @media (min-width: 992px) {
             .page-card {
                 padding: 2.6rem 2.7rem 2.8rem;
             }
         }
-        
+
         .page-title {
             font-size: 2rem;
-            /* tiêu đề bự hơn */
             font-weight: 800;
             color: var(--primary-700);
         }
-        
+
         .page-subtitle {
             font-size: 1.05rem;
             color: var(--text-soft);
         }
+
         /* ==== FORM & BUTTON ==== */
-        
         .form-label {
             font-size: 1rem;
             font-weight: 600;
             color: var(--text);
         }
-        
+
         .form-control {
             font-size: 1rem;
             padding: 0.7rem 1rem;
         }
-        
+
         .btn {
             font-size: 1rem;
             padding: 0.65rem 1.35rem;
             border-radius: 12px;
             font-weight: 600;
         }
-        
+
         #lookupGuest .form-control:focus {
             box-shadow: var(--focus-ring);
             border-color: var(--primary-600);
         }
-        
+
         #btnLoadUserBookings,
         #lookupGuest button[type="submit"] {
             background: linear-gradient(135deg, var(--primary), var(--primary-600));
             border: none;
             box-shadow: 0 4px 12px rgba(10, 90, 215, 0.25);
         }
-        
+
         #btnLoadUserBookings:hover,
         #lookupGuest button[type="submit"]:hover {
             background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
             transform: translateY(-1px);
         }
-        
+
         #alertArea {
             border-radius: var(--radius-lg);
             font-size: 1rem;
         }
+
         /* ==== TICKET LIST ==== */
-        
         .ticket-card {
             border-radius: 1rem;
             border: 1px solid #e2e6f0;
             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
         }
-        
+
         .badge-soft {
             background-color: #eef2ff;
             color: #3730a3;
         }
-        
+
         .badge-status {
             font-size: 0.85rem;
             padding: 0.35rem 0.7rem;
             border-radius: 999px;
         }
-        
+
         .code-pill {
             font-family: "SF Mono", "Menlo", "Consolas", monospace;
             font-size: 0.9rem;
@@ -209,7 +204,7 @@
             padding: 0.25rem 0.75rem;
             border-radius: 999px;
         }
-        
+
         .seat-pill {
             font-size: 0.9rem;
             border-radius: 999px;
@@ -218,16 +213,16 @@
             color: #0f766e;
             border: 1px dashed #0f766e;
         }
-        
+
         .text-small {
             font-size: 0.95rem;
         }
-        
+
         .card-header .fw-semibold {
             font-size: 1.1rem;
             font-weight: 700;
         }
-        
+
         #filterStatus {
             font-size: 0.95rem;
         }
@@ -239,7 +234,8 @@
     <nav class="navbar navbar-expand-lg booking-navbar">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdk1KSWlpLDRMeHJM6uZpOhHTWgzEzgDuU6ZKf1go82QKatnJwwUWcGVz3nC1JHMUHa34&usqp=CAU" alt="Ba Duy Bus" class="brand-logo">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdk1KSWlpLDRMeHJM6uZpOhHTWgzEzgDuU6ZKf1go82QKatnJwwUWcGVz3nC1JHMUHa34&usqp=CAU"
+                    alt="Ba Duy Bus" class="brand-logo">
                 <span>
                     Du Lịch Ba Duy
                     <div class="brand-text-small">Tra cứu vé đã đặt</div>
@@ -292,7 +288,8 @@
                                     <label for="phoneInput" class="form-label text-small mb-1">
                                         Số điện thoại đã dùng để đặt vé
                                     </label>
-                                    <input type="tel" class="form-control" id="phoneInput" placeholder="Ví dụ: 0347448344" required>
+                                    <input type="tel" class="form-control" id="phoneInput" placeholder="Ví dụ: 0347448344"
+                                        required>
                                     <div class="form-text text-small">
                                         Vui lòng nhập đúng số điện thoại đã dùng khi đặt vé.
                                     </div>
@@ -313,7 +310,8 @@
                                 <h2 class="h6 fw-semibold mb-1">Lịch sử vé của bạn</h2>
                                 <div class="text-small text-muted">
                                     Đang đăng nhập với số điện thoại
-                                    <span id="currentUserPhone" class="fw-semibold"></span>. Hệ thống sẽ tra cứu tất cả vé gắn với số điện thoại này.
+                                    <span id="currentUserPhone" class="fw-semibold"></span>. Hệ thống sẽ tra cứu tất cả vé
+                                    gắn với số điện thoại này.
                                 </div>
                             </div>
                             <button id="btnLoadUserBookings" class="btn btn-primary mt-3 mt-md-0">
@@ -324,7 +322,8 @@
 
                     <!-- Bộ lọc & kết quả -->
                     <div class="card ticket-card">
-                        <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center">
+                        <div
+                            class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center">
                             <div class="fw-semibold">
                                 Kết quả tra cứu
                             </div>
@@ -352,6 +351,7 @@
             </div>
         </div>
     </div>
+
     <!-- Popup Map -->
     <div class="modal fade" id="mapModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -368,24 +368,25 @@
                     </div>
 
                     <!-- GHI CHÚ TRẠNG THÁI XE -->
-                    <div class="mt-3 p-3 rounded shadow-sm" style="background:#f8f9fa; border-left:4px solid #0d6efd; font-size:14px;">
+                    <div class="mt-3 p-3 rounded shadow-sm"
+                        style="background:#f8f9fa; border-left:4px solid #0d6efd; font-size:14px;">
                         <div class="fw-semibold mb-2">Ghi chú trạng thái xe</div>
 
                         <div class="d-flex align-items-center mb-1">
-                            <span style="display:inline-block;width:14px;height:14px;
-                     background:#00cc44;border-radius:50%;margin-right:8px;"></span>
+                            <span
+                                style="display:inline-block;width:14px;height:14px;background:#00cc44;border-radius:50%;margin-right:8px;"></span>
                             <span>Đang chạy <span class="text-muted">(màu xanh)</span></span>
                         </div>
 
                         <div class="d-flex align-items-center mb-1">
-                            <span style="display:inline-block;width:14px;height:14px;
-                     background:#ff3333;border-radius:50%;margin-right:8px;"></span>
+                            <span
+                                style="display:inline-block;width:14px;height:14px;background:#ff3333;border-radius:50%;margin-right:8px;"></span>
                             <span>Đang dừng <span class="text-muted">(màu đỏ)</span></span>
                         </div>
 
                         <div class="d-flex align-items-center">
-                            <span style="display:inline-block;width:14px;height:14px;
-                     background:#ff66cc;border-radius:50%;margin-right:8px;"></span>
+                            <span
+                                style="display:inline-block;width:14px;height:14px;background:#ff66cc;border-radius:50%;margin-right:8px;"></span>
                             <span>Đỗ lâu <span class="text-muted">(màu hồng)</span></span>
                         </div>
                     </div>
@@ -397,456 +398,526 @@
 
 
     <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Dùng backend thật trên Render -->
-<script>
-    window.API_BASE = 'https://webdatve.onrender.com';
-</script>
+    <!-- Dùng backend thật trên Render -->
+    <script>
+        window.API_BASE = 'https://webdatve.onrender.com';
+    </script>
 
-<script>
-    (function() {
-        // Nếu backend của bạn dùng prefix khác, chỉnh lại API_BASE cho phù hợp
-        var API_BASE = window.API_BASE || '';
+    <script>
+        (function () {
+            var API_BASE = window.API_BASE || '';
 
-        var alertArea = document.getElementById('alertArea');
-        var lookupGuest = document.getElementById('lookupGuest');
-        var lookupUser = document.getElementById('lookupUser');
-        var currentUserPhoneEl = document.getElementById('currentUserPhone');
-        var btnLoadUserBookings = document.getElementById('btnLoadUserBookings');
-        var guestLookupForm = document.getElementById('guestLookupForm');
-        var phoneInput = document.getElementById('phoneInput');
-        var resultsArea = document.getElementById('resultsArea');
-        var filterStatus = document.getElementById('filterStatus');
+            var alertArea = document.getElementById('alertArea');
+            var lookupGuest = document.getElementById('lookupGuest');
+            var lookupUser = document.getElementById('lookupUser');
+            var currentUserPhoneEl = document.getElementById('currentUserPhone');
+            var btnLoadUserBookings = document.getElementById('btnLoadUserBookings');
+            var guestLookupForm = document.getElementById('guestLookupForm');
+            var phoneInput = document.getElementById('phoneInput');
+            var resultsArea = document.getElementById('resultsArea');
+            var filterStatus = document.getElementById('filterStatus');
 
-        var currentUser = null;
-        var currentBookings = [];
+            var currentUser = null;
+            var currentBookings = [];
 
-        function getCurrentUserFromLocalStorage() {
-            // Thử đọc từ 2 key phổ biến: 'currentUser' hoặc 'user'
-            var raw = localStorage.getItem('currentUser') || localStorage.getItem('user');
-            if (!raw) return null;
-            try {
-                return JSON.parse(raw);
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function pad2(n) {
-            return n < 10 ? '0' + n : '' + n;
-        }
-
-        function formatDateTime(iso) {
-            if (!iso) return '';
-            var d = new Date(iso);
-            if (isNaN(d.getTime())) return '';
-            var time = pad2(d.getHours()) + ':' + pad2(d.getMinutes());
-            var date = pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear();
-            return time + ' ' + date;
-        }
-
-        // Phân loại vé theo thời gian đi và trạng thái
-        function getTimeStatus(booking) {
-            if (!booking) return 'other';
-
-            if (booking.status === 'cancelled') {
-                return 'cancelled';
+            function getCurrentUserFromLocalStorage() {
+                var raw = localStorage.getItem('currentUser') || localStorage.getItem('user');
+                if (!raw) return null;
+                try {
+                    return JSON.parse(raw);
+                } catch (e) {
+                    return null;
+                }
             }
 
-            var depIso = booking.departureTime || (booking.trip && booking.trip.departureTime);
-            if (!depIso) {
-                return 'other';
+            function pad2(n) {
+                return n < 10 ? '0' + n : '' + n;
             }
 
-            var now = new Date();
-            var dep = new Date(depIso);
-            if (isNaN(dep.getTime())) return 'other';
-
-            if (dep.getTime() < now.getTime()) {
-                return 'past';
+            function formatDateTime(iso) {
+                if (!iso) return '';
+                var d = new Date(iso);
+                if (isNaN(d.getTime())) return '';
+                var time = pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+                var date = pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear();
+                return time + ' ' + date;
             }
 
-            var diff = dep.getTime() - now.getTime();
-            var oneDay = 24 * 60 * 60 * 1000;
-            if (diff <= oneDay) {
-                return 'upcoming_soon';
-            }
-            return 'upcoming';
-        }
+            // Phân loại vé theo thời gian đi và trạng thái
+            function getTimeStatus(booking) {
+                if (!booking) return 'other';
 
-        function getTimeStatusLabel(code) {
-            if (code === 'upcoming_soon') return 'Sắp đi';
-            if (code === 'upcoming') return 'Chưa đi';
-            if (code === 'past') return 'Đã đi';
-            if (code === 'cancelled') return 'Đã hủy';
-            return 'Khác';
-        }
-
-        function getPaymentStatusBadge(status) {
-            if (status === 'success') {
-                return '<span class="badge badge-status bg-success-subtle text-success">Thanh toán thành công</span>';
-            }
-            if (status === 'pending') {
-                return '<span class="badge badge-status bg-warning-subtle text-warning">Chờ thanh toán</span>';
-            }
-            if (status === 'failed') {
-                return '<span class="badge badge-status bg-danger-subtle text-danger">Thanh toán thất bại</span>';
-            }
-            return '<span class="badge badge-status bg-secondary-subtle text-secondary">Khác</span>';
-        }
-
-        function getBookingStatusBadge(status) {
-            if (status === 'confirmed') {
-                return '<span class="badge badge-status bg-primary-subtle text-primary">Đã xác nhận</span>';
-            }
-            if (status === 'completed') {
-                return '<span class="badge badge-status bg-success-subtle text-success">Đã hoàn thành</span>';
-            }
-            if (status === 'cancelled') {
-                return '<span class="badge badge-status bg-danger-subtle text-danger">Đã hủy</span>';
-            }
-            return '<span class="badge badge-status bg-secondary-subtle text-secondary">Khác</span>';
-        }
-
-        function formatCurrencyVND(amount) {
-            if (!amount && amount !== 0) return '';
-            try {
-                return amount.toLocaleString('vi-VN') + 'đ';
-            } catch (e) {
-                return amount + 'đ';
-            }
-        }
-
-        function renderBookings() {
-            var filter = filterStatus.value;
-
-            if (!currentBookings || !currentBookings.length) {
-                resultsArea.innerHTML =
-                    '<p class="text-muted text-small mb-0">Không tìm thấy vé nào. Hãy kiểm tra lại số điện thoại hoặc trạng thái thanh toán.</p>';
-                return;
-            }
-
-            // Sort theo thời gian khởi hành (mới -> cũ)
-            currentBookings.sort(function(a, b) {
-                var aDep = new Date(a.departureTime || (a.trip && a.trip.departureTime) || a.createdAt || 0).getTime();
-                var bDep = new Date(b.departureTime || (b.trip && b.trip.departureTime) || b.createdAt || 0).getTime();
-                return bDep - aDep;
-            });
-
-            var html = '';
-            for (var i = 0; i < currentBookings.length; i++) {
-                var bk = currentBookings[i];
-
-                var timeStatus = getTimeStatus(bk);
-                if (filter !== 'all' && filter !== timeStatus) {
-                    continue;
+                if (booking.status === 'cancelled') {
+                    return 'cancelled';
                 }
 
-                var trip = bk.trip || {};
-                var routeName = bk.routeName || ((trip.from && trip.to) ? (trip.from + ' - ' + trip.to) : 'Chưa rõ tuyến');
-
-                var depIso = bk.departureTime || trip.departureTime;
-                var depText = formatDateTime(depIso);
-
-                // Pickup + dropoff ES5
-                var pickup = (bk.customer && bk.customer.pickupPoint) ?
-                    bk.customer.pickupPoint :
-                    (bk.pickupPoint || '-');
-
-                var dropoff = (bk.customer && bk.customer.dropoffPoint) ?
-                    bk.customer.dropoffPoint :
-                    (bk.dropoffPoint || '-');
-
-                var seatCodes = bk.seatCodes || [];
-                var payment = bk.payment || {};
-
-                var ticketCode = bk._id || bk.id || '';
-
-                var timeStatusLabel = getTimeStatusLabel(timeStatus);
-                var paymentBadge = getPaymentStatusBadge(payment.status);
-                var bookingBadge = getBookingStatusBadge(bk.status);
-
-                // Seats ES5
-                var seatsHtml = '';
-                for (var j = 0; j < seatCodes.length; j++) {
-                    seatsHtml += '<span class="seat-pill me-1 mb-1">' + seatCodes[j] + '</span>';
+                var depIso = booking.departureTime || (booking.trip && (booking.trip.departureTime || booking.trip.departAt));
+                if (!depIso) {
+                    return 'other';
                 }
 
-                html += '' +
-                    '<div class="border-bottom py-3">' +
-                    '  <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">' +
-                    '    <div>' +
-                    '      <div class="text-small text-muted mb-1">Mã vé</div>' +
-                    '      <span class="code-pill">' + ticketCode + '</span>' +
-                    '    </div>' +
-                    '    <div class="d-flex flex-wrap gap-2">' +
-                    bookingBadge +
-                    paymentBadge +
-                    '      <span class="badge badge-status badge-soft">' + timeStatusLabel + '</span>' +
-                    '    </div>' +
-                    '  </div>' +
+                var now = new Date();
+                var dep = new Date(depIso);
+                if (isNaN(dep.getTime())) return 'other';
 
-                    '  <div class="row text-small">' +
-                    '    <div class="col-md-6 mb-2">' +
-                    '      <div class="fw-semibold">' + routeName + '</div>' +
-                    '      <div class="text-muted">Giờ khởi hành: ' + depText + '</div>' +
-                    '      <div class="mt-1"><span class="text-muted">Ghế: </span>' + seatsHtml + '</div>' +
-                    '    </div>' +
-
-                    '    <div class="col-md-3 mb-2">' +
-                    '      <div class="text-muted mb-1">Điểm đón</div>' +
-                    '      <div class="fw-semibold">' + pickup + '</div>' +
-                    '    </div>' +
-
-                    '    <div class="col-md-3 mb-2">' +
-                    '      <div class="text-muted mb-1">Điểm trả</div>' +
-                    '      <div class="fw-semibold">' + dropoff + '</div>' +
-                    '    </div>' +
-                    '  </div>' +
-
-                    '  <div class="d-flex justify-content-between align-items-center mt-2 text-small flex-wrap gap-2">' +
-                    '    <div>' +
-                    '      <span class="text-muted">Hình thức thanh toán: </span>' +
-                    '      <span class="fw-semibold text-uppercase">' + (payment.method || 'N/A') + '</span>' +
-                    '    </div>' +
-                    '    <div class="fw-semibold">Tổng tiền: ' + formatCurrencyVND(payment.amount || 0) + '</div>' +
-                    '  </div>' +
-
-                    // === NÚT XEM MAP THÊM VÀO (ES5 an toàn) ===
-                    '  <button onclick="openMap()" class="btn btn-sm btn-outline-primary mt-2">🗺️ Xem vị trí xe</button>' +
-
-                    '</div>';
-            }
-
-            if (!html) {
-                resultsArea.innerHTML =
-                    '<p class="text-muted text-small mb-0">Không có vé nào phù hợp với bộ lọc hiện tại.</p>';
-            } else {
-                resultsArea.innerHTML = html;
-            }
-        }
-
-
-        function setLoading(isLoading) {
-            if (isLoading) {
-                resultsArea.innerHTML =
-                    '<div class="text-center py-4 text-small text-muted">Đang tải dữ liệu vé, vui lòng chờ...</div>';
-            }
-        }
-
-        function showError(message) {
-            resultsArea.innerHTML =
-                '<div class="text-danger text-small py-3">' + message + '</div>';
-        }
-
-        function lookupByPhone(phone) {
-            if (!phone) {
-                showError('Số điện thoại không hợp lệ.');
-                return;
-            }
-
-            setLoading(true);
-
-            var url = API_BASE + '/api/bookings/lookup?phone=' + encodeURIComponent(phone);
-
-            // Dùng fetch với then/catch cho tương thích ES5 tốt hơn
-            fetch(url, {
-                method: 'GET',
-                credentials: 'include'
-            }).then(function(res) {
-                if (!res.ok) {
-                    throw new Error('Lỗi ' + res.status);
-                }
-                return res.json();
-            }).then(function(data) {
-                // Tùy backend: có thể trả về mảng trực tiếp hoặc {items: []}
-                if (Object.prototype.toString.call(data) === '[object Array]') {
-                    currentBookings = data;
-                } else if (data && data.items && Object.prototype.toString.call(data.items) === '[object Array]') {
-                    currentBookings = data.items;
-                } else {
-                    currentBookings = [];
+                if (dep.getTime() < now.getTime()) {
+                    return 'past';
                 }
 
-                if (!currentBookings.length) {
+                var diff = dep.getTime() - now.getTime();
+                var oneDay = 24 * 60 * 60 * 1000;
+                if (diff <= oneDay) {
+                    return 'upcoming_soon';
+                }
+                return 'upcoming';
+            }
+
+            function getTimeStatusLabel(code) {
+                if (code === 'upcoming_soon') return 'Sắp đi';
+                if (code === 'upcoming') return 'Chưa đi';
+                if (code === 'past') return 'Đã đi';
+                if (code === 'cancelled') return 'Đã hủy';
+                return 'Khác';
+            }
+
+            // Kiểm tra xem vé này có đủ điều kiện để hiển thị nút Hủy hay không
+            function canCancelBooking(bk) {
+                if (!bk) return false;
+
+                // Không hủy nếu đã hủy, đã hoàn thành, đã check-in
+                if (bk.status === 'cancelled' || bk.status === 'completed' || bk.checkedIn) {
+                    return false;
+                }
+
+                var depIso =
+                    bk.departureTime ||
+                    (bk.trip && (bk.trip.departureTime || bk.trip.departAt));
+
+                if (!depIso) return false;
+
+                var now = new Date();
+                var dep = new Date(depIso);
+                if (isNaN(dep.getTime())) return false;
+
+                var diffMs = dep.getTime() - now.getTime();
+                var diffHours = diffMs / (1000 * 60 * 60);
+
+                // Ràng buộc: phải còn ít nhất 2 giờ
+                if (diffHours < 2) return false;
+
+                return true;
+            }
+
+            function getPaymentStatusBadge(status) {
+                if (status === 'paid') {
+                    return '<span class="badge badge-status bg-success-subtle text-success">Thanh toán thành công</span>';
+                }
+                if (status === 'pending') {
+                    return '<span class="badge badge-status bg-warning-subtle text-warning">Chờ thanh toán</span>';
+                }
+                if (status === 'failed') {
+                    return '<span class="badge badge-status bg-danger-subtle text-danger">Thanh toán thất bại</span>';
+                }
+                if (status === 'refunded') {
+                    return '<span class="badge badge-status bg-info-subtle text-info">Đã hoàn tiền</span>';
+                }
+                return '<span class="badge badge-status bg-secondary-subtle text-secondary">Khác</span>';
+            }
+
+            function getBookingStatusBadge(status) {
+                if (status === 'confirmed') {
+                    return '<span class="badge badge-status bg-primary-subtle text-primary">Đã xác nhận</span>';
+                }
+                if (status === 'completed') {
+                    return '<span class="badge badge-status bg-success-subtle text-success">Đã hoàn thành</span>';
+                }
+                if (status === 'cancelled') {
+                    return '<span class="badge badge-status bg-danger-subtle text-danger">Đã hủy</span>';
+                }
+                return '<span class="badge badge-status bg-secondary-subtle text-secondary">Khác</span>';
+            }
+
+            function formatCurrencyVND(amount) {
+                if (!amount && amount !== 0) return '';
+                try {
+                    return amount.toLocaleString('vi-VN') + 'đ';
+                } catch (e) {
+                    return amount + 'đ';
+                }
+            }
+
+            function renderBookings() {
+                var filter = filterStatus.value;
+
+                if (!currentBookings || !currentBookings.length) {
                     resultsArea.innerHTML =
-                        '<p class="text-muted text-small mb-0">Không tìm thấy vé nào cho số điện thoại ' +
-                        '<strong>' + phone + '</strong>.</p>';
+                        '<p class="text-muted text-small mb-0">Không tìm thấy vé nào. Hãy kiểm tra lại số điện thoại hoặc trạng thái thanh toán.</p>';
                     return;
                 }
 
-                renderBookings();
-            }).catch(function(err) {
-                showError('Không thể tra cứu vé. Vui lòng thử lại sau. (' + err.message + ')');
-            });
-        }
+                // Sort theo thời gian khởi hành (mới -> cũ)
+                currentBookings.sort(function (a, b) {
+                    var aDep = new Date(a.departureTime || (a.trip && (a.trip.departureTime || a.trip.departAt)) || a.createdAt || 0).getTime();
+                    var bDep = new Date(b.departureTime || (b.trip && (b.trip.departureTime || b.trip.departAt)) || b.createdAt || 0).getTime();
+                    return bDep - aDep;
+                });
 
-        // Xử lý form khách vãng lai
-        if (guestLookupForm) {
-            guestLookupForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var phone = (phoneInput.value || '').trim();
-                if (!phone) {
-                    phoneInput.focus();
-                    return;
+                var html = '';
+                for (var i = 0; i < currentBookings.length; i++) {
+                    var bk = currentBookings[i];
+
+                    var timeStatus = getTimeStatus(bk);
+                    if (filter !== 'all' && filter !== timeStatus) {
+                        continue;
+                    }
+
+                    var trip = bk.trip || {};
+                    var routeName = bk.routeName ||
+                        ((trip.from && trip.to) ? (trip.from + ' - ' + trip.to) : 'Chưa rõ tuyến');
+
+                    var depIso = bk.departureTime || trip.departureTime || trip.departAt;
+                    var depText = formatDateTime(depIso);
+
+                    var pickup = (bk.customer && bk.customer.pickupPoint) ?
+                        bk.customer.pickupPoint :
+                        (bk.pickupPoint || '-');
+
+                    var dropoff = (bk.customer && bk.customer.dropoffPoint) ?
+                        bk.customer.dropoffPoint :
+                        (bk.dropoffPoint || '-');
+
+                    var seatCodes = bk.seatCodes || [];
+                    var payment = bk.payment || {};
+
+                    var ticketCode = bk._id || bk.id || '';
+
+                    var timeStatusLabel = getTimeStatusLabel(timeStatus);
+                    var paymentBadge = getPaymentStatusBadge(payment.status);
+                    var bookingBadge = getBookingStatusBadge(bk.status);
+
+                    var seatsHtml = '';
+                    for (var j = 0; j < seatCodes.length; j++) {
+                        seatsHtml += '<span class="seat-pill me-1 mb-1">' + seatCodes[j] + '</span>';
+                    }
+
+                    var canCancel = canCancelBooking(bk);
+
+                    html += '' +
+                        '<div class="border-bottom py-3">' +
+                        '  <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">' +
+                        '    <div>' +
+                        '      <div class="text-small text-muted mb-1">Mã vé</div>' +
+                        '      <span class="code-pill">' + ticketCode + '</span>' +
+                        '    </div>' +
+                        '    <div class="d-flex flex-wrap gap-2">' +
+                        bookingBadge +
+                        paymentBadge +
+                        '      <span class="badge badge-status badge-soft">' + timeStatusLabel + '</span>' +
+                        '    </div>' +
+                        '  </div>' +
+
+                        '  <div class="row text-small">' +
+                        '    <div class="col-md-6 mb-2">' +
+                        '      <div class="fw-semibold">' + routeName + '</div>' +
+                        '      <div class="text-muted">Giờ khởi hành: ' + depText + '</div>' +
+                        '      <div class="mt-1"><span class="text-muted">Ghế: </span>' + seatsHtml + '</div>' +
+                        '    </div>' +
+
+                        '    <div class="col-md-3 mb-2">' +
+                        '      <div class="text-muted mb-1">Điểm đón</div>' +
+                        '      <div class="fw-semibold">' + pickup + '</div>' +
+                        '    </div>' +
+
+                        '    <div class="col-md-3 mb-2">' +
+                        '      <div class="text-muted mb-1">Điểm trả</div>' +
+                        '      <div class="fw-semibold">' + dropoff + '</div>' +
+                        '    </div>' +
+                        '  </div>' +
+
+                        '  <div class="d-flex justify-content-between align-items-center mt-2 text-small flex-wrap gap-2">' +
+                        '    <div>' +
+                        '      <span class="text-muted">Hình thức thanh toán: </span>' +
+                        '      <span class="fw-semibold text-uppercase">' + (payment.method || 'N/A') + '</span>' +
+                        '    </div>' +
+                        '    <div class="fw-semibold">Tổng tiền: ' + formatCurrencyVND(payment.amount || 0) + '</div>' +
+                        '  </div>' +
+
+                        '  <div class="mt-2 d-flex flex-wrap gap-2">' +
+                        '    <button onclick="openMap()" class="btn btn-sm btn-outline-primary">🗺️ Xem vị trí xe</button>' +
+                        (canCancel
+                            ? '    <button class="btn btn-sm btn-outline-danger btn-cancel-ticket" data-id="' + ticketCode + '">Hủy vé</button>'
+                            : '') +
+                        '  </div>' +
+                        '</div>';
                 }
-                lookupByPhone(phone);
-            });
-        }
 
-        // Xử lý nút "Xem lịch sử vé" của user đã đăng nhập
-        if (btnLoadUserBookings) {
-            btnLoadUserBookings.addEventListener('click', function() {
-                if (currentUser && currentUser.phone) {
-                    lookupByPhone(currentUser.phone);
+                if (!html) {
+                    resultsArea.innerHTML =
+                        '<p class="text-muted text-small mb-0">Không có vé nào phù hợp với bộ lọc hiện tại.</p>';
+                } else {
+                    resultsArea.innerHTML = html;
+
+                    var cancelButtons = resultsArea.querySelectorAll('.btn-cancel-ticket');
+                    for (var k = 0; k < cancelButtons.length; k++) {
+                        cancelButtons[k].addEventListener('click', function () {
+                            var id = this.getAttribute('data-id');
+                            handleCancelTicket(id);
+                        });
+                    }
                 }
-            });
-        }
-
-        // Bộ lọc
-        filterStatus.addEventListener('change', function() {
-            renderBookings();
-        });
-
-        // Khởi tạo trạng thái trang
-        function initPage() {
-            currentUser = getCurrentUserFromLocalStorage();
-
-            // 🟢 ĐÃ ĐĂNG NHẬP
-            if (currentUser && currentUser.phone) {
-                alertArea.className = 'alert alert-success text-small';
-                alertArea.innerHTML =
-                    'Bạn đang đăng nhập bằng số điện thoại <strong>' +
-                    currentUser.phone +
-                    '</strong>. Bạn không cần nhập số điện thoại để tra cứu.';
-
-                lookupUser.style.display = 'block';
-                lookupGuest.style.display = 'none';
-
-                currentUserPhoneEl.textContent = currentUser.phone;
-
-                return; // ⭐ NGĂN CHẶN CHẠY LOGIC GUEST
             }
 
-            // 🔵 CHƯA ĐĂNG NHẬP HOẶC KHÔNG CÓ phone
-            alertArea.className = 'alert alert-info text-small';
-            alertArea.innerHTML =
-                'Bạn chưa đăng nhập hoặc tài khoản chưa có số điện thoại. Hãy nhập số điện thoại để tra cứu vé.';
+            function handleCancelTicket(id) {
+                if (!id) return;
 
-            lookupUser.style.display = 'none';
-            lookupGuest.style.display = 'block';
-        }
+                if (!confirm('Bạn có chắc chắn muốn hủy vé này không?')) {
+                    return;
+                }
 
-        initPage();
-    })();
+                var url = API_BASE + '/api/bookings/' + encodeURIComponent(id) + '/cancel';
 
-    var map = null;
-    var markers = {};
-    var adsunUrl = "https://shareapi.adsun.vn/Vehicle/GpsInfos?pageIds=3036&username=letananh&pwd=12345";
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                })
+                    .then(function (res) {
+                        return res.json().then(function (body) {
+                            return { ok: res.ok, body: body };
+                        });
+                    })
+                    .then(function (resp) {
+                        var body = resp.body || {};
+                        if (!resp.ok || !body.success) {
+                            alert(body.message || 'Hủy vé thất bại, vui lòng thử lại.');
+                            return;
+                        }
 
-    // ========================
-    // ICON THEO TRẠNG THÁI XE
-    // ========================
-    function getCarIcon(speed, lastUpdate) {
-        let color = "#00cc44"; // xanh = đang chạy
+                        alert(body.message || 'Hủy vé thành công.');
 
-        if (speed === 0) {
-            const diffMin = (Date.now() - new Date(lastUpdate)) / 60000;
+                        for (var i = 0; i < currentBookings.length; i++) {
+                            var bk = currentBookings[i];
+                            if (bk._id === id || bk.id === id) {
+                                bk.status = 'cancelled';
+                                if (bk.payment) {
+                                    bk.payment.status = 'refunded';
+                                }
+                                break;
+                            }
+                        }
 
-            if (diffMin > 10) color = "#ff66cc"; // hồng = đỗ lâu
-            else color = "#ff3333"; // đỏ = dừng
-        }
+                        renderBookings();
+                    })
+                    .catch(function (err) {
+                        alert('Không thể hủy vé. Vui lòng thử lại sau. (' + err.message + ')');
+                    });
+            }
 
-        return L.divIcon({
-            html: `
-            <svg width="28" height="28" viewBox="0 0 24 24"
-                fill="${color}" stroke="black" stroke-width="1.2">
-                <path d="M5 11L3 17H4L5 20H7L8 17H16L17 20H19L20 17H21L19 11L15 7H9L5 11Z"/>
-            </svg>
-        `,
-            className: "",
-            iconSize: [28, 28],
-            iconAnchor: [14, 14]
-        });
-    }
+            function setLoading(isLoading) {
+                if (isLoading) {
+                    resultsArea.innerHTML =
+                        '<div class="text-center py-4 text-small text-muted">Đang tải dữ liệu vé, vui lòng chờ...</div>';
+                }
+            }
 
-    // ========================
-    // MAP
-    // ========================
-    function initLeafletMap() {
-        if (!map) {
-            map = L.map('map').setView([10.75, 106.66], 10);
+            function showError(message) {
+                resultsArea.innerHTML =
+                    '<div class="text-danger text-small py-3">' + message + '</div>';
+            }
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-        }
+            function lookupByPhone(phone) {
+                if (!phone) {
+                    showError('Số điện thoại không hợp lệ.');
+                    return;
+                }
 
-        // Load lần đầu
-        loadGpsLeaflet();
+                setLoading(true);
 
-        // Cập nhật mỗi 5s
-        setInterval(loadGpsLeaflet, 5000);
-    }
+                var url = API_BASE + '/api/bookings/lookup?phone=' + encodeURIComponent(phone);
 
-    function openMap() {
-        var modalEl = document.getElementById('mapModal');
-        var modal = new bootstrap.Modal(modalEl);
-        modal.show();
+                fetch(url, {
+                    method: 'GET',
+                    credentials: 'include'
+                }).then(function (res) {
+                    if (!res.ok) {
+                        throw new Error('Lỗi ' + res.status);
+                    }
+                    return res.json();
+                }).then(function (data) {
+                    if (Object.prototype.toString.call(data) === '[object Array]') {
+                        currentBookings = data;
+                    } else if (data && data.items && Object.prototype.toString.call(data.items) === '[object Array]') {
+                        currentBookings = data.items;
+                    } else {
+                        currentBookings = [];
+                    }
 
-        setTimeout(initLeafletMap, 300);
-    }
-
-    // ========================
-    // LOAD GPS
-    // ========================
-    function loadGpsLeaflet() {
-        fetch(adsunUrl)
-            .then(res => res.json())
-            .then(result => {
-                var data = result.Data || [];
-
-                data.forEach(v => {
-                    if (!v.Lat || !v.Lng) return;
-
-                    var latlng = [v.Lat, v.Lng];
-                    var icon = getCarIcon(v.Speed, v.TimeUpdate);
-
-                    // Nếu marker đã tồn tại → UPDATE real-time
-                    if (markers[v.Id]) {
-                        markers[v.Id].setLatLng(latlng);
-                        markers[v.Id].setIcon(icon);
-                        markers[v.Id].setPopupContent(
-                            "<b>Xe: " + v.Plate + "</b><br>" +
-                            "Tài xế: " + v.DriverName + "<br>" +
-                            "Tốc độ: " + v.Speed + " km/h<br>" +
-                            "Lần cập nhật: " + v.TimeUpdate + "<br>" +
-                            "Địa chỉ: " + v.Address
-                        );
+                    if (!currentBookings.length) {
+                        resultsArea.innerHTML =
+                            '<p class="text-muted text-small mb-0">Không tìm thấy vé nào cho số điện thoại ' +
+                            '<strong>' + phone + '</strong>.</p>';
                         return;
                     }
 
-                    // Nếu marker chưa có → tạo mới
-                    var marker = L.marker(latlng, {
+                    renderBookings();
+                }).catch(function (err) {
+                    showError('Không thể tra cứu vé. Vui lòng thử lại sau. (' + err.message + ')');
+                });
+            }
+
+            if (guestLookupForm) {
+                guestLookupForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    var phone = (phoneInput.value || '').trim();
+                    if (!phone) {
+                        phoneInput.focus();
+                        return;
+                    }
+                    lookupByPhone(phone);
+                });
+            }
+
+            if (btnLoadUserBookings) {
+                btnLoadUserBookings.addEventListener('click', function () {
+                    if (currentUser && currentUser.phone) {
+                        lookupByPhone(currentUser.phone);
+                    }
+                });
+            }
+
+            filterStatus.addEventListener('change', function () {
+                renderBookings();
+            });
+
+            function initPage() {
+                currentUser = getCurrentUserFromLocalStorage();
+
+                if (currentUser && currentUser.phone) {
+                    alertArea.className = 'alert alert-success text-small';
+                    alertArea.innerHTML =
+                        'Bạn đang đăng nhập bằng số điện thoại <strong>' +
+                        currentUser.phone +
+                        '</strong>. Bạn không cần nhập số điện thoại để tra cứu.';
+
+                    lookupUser.style.display = 'block';
+                    lookupGuest.style.display = 'none';
+
+                    currentUserPhoneEl.textContent = currentUser.phone;
+
+                    return;
+                }
+
+                alertArea.className = 'alert alert-info text-small';
+                alertArea.innerHTML =
+                    'Bạn chưa đăng nhập hoặc tài khoản chưa có số điện thoại. Hãy nhập số điện thoại để tra cứu vé.';
+
+                lookupUser.style.display = 'none';
+                lookupGuest.style.display = 'block';
+            }
+
+            initPage();
+        })();
+
+        // ========================
+        // MAP + GPS REALTIME
+        // ========================
+        var map = null;
+        var markers = {};
+        var adsunUrl = "https://shareapi.adsun.vn/Vehicle/GpsInfos?pageIds=3036&username=letananh&pwd=12345";
+
+        function getCarIcon(speed, lastUpdate) {
+            var color = "#00cc44";
+
+            if (speed === 0) {
+                var diffMin = (Date.now() - new Date(lastUpdate)) / 60000;
+
+                if (diffMin > 10) color = "#ff66cc";
+                else color = "#ff3333";
+            }
+
+            return L.divIcon({
+                html: '\
+            <svg width="28" height="28" viewBox="0 0 24 24"\
+                fill="' + color + '" stroke="black" stroke-width="1.2">\
+                <path d="M5 11L3 17H4L5 20H7L8 17H16L17 20H19L20 17H21L19 11L15 7H9L5 11Z"/>\
+            </svg>',
+                className: "",
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            });
+        }
+
+        function initLeafletMap() {
+            if (!map) {
+                map = L.map('map').setView([10.75, 106.66], 10);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+            }
+
+            loadGpsLeaflet();
+
+            setInterval(loadGpsLeaflet, 5000);
+        }
+
+        function openMap() {
+            var modalEl = document.getElementById('mapModal');
+            var modal = new bootstrap.Modal(modalEl);
+            modal.show();
+
+            setTimeout(initLeafletMap, 300);
+        }
+
+        function loadGpsLeaflet() {
+            fetch(adsunUrl)
+                .then(function (res) { return res.json(); })
+                .then(function (result) {
+                    var data = result.Data || [];
+
+                    data.forEach(function (v) {
+                        if (!v.Lat || !v.Lng) return;
+
+                        var latlng = [v.Lat, v.Lng];
+                        var icon = getCarIcon(v.Speed, v.TimeUpdate);
+
+                        if (markers[v.Id]) {
+                            markers[v.Id].setLatLng(latlng);
+                            markers[v.Id].setIcon(icon);
+                            markers[v.Id].setPopupContent(
+                                "<b>Xe: " + v.Plate + "</b><br>" +
+                                "Tài xế: " + v.DriverName + "<br>" +
+                                "Tốc độ: " + v.Speed + " km/h<br>" +
+                                "Lần cập nhật: " + v.TimeUpdate + "<br>" +
+                                "Địa chỉ: " + v.Address
+                            );
+                            return;
+                        }
+
+                        var marker = L.marker(latlng, {
                             icon: icon
                         })
-                        .bindPopup(
-                            "<b>Xe: " + v.Plate + "</b><br>" +
-                            "Tài xế: " + v.DriverName + "<br>" +
-                            "Tốc độ: " + v.Speed + " km/h<br>" +
-                            "Lần cập nhật: " + v.TimeUpdate + "<br>" +
-                            "Địa chỉ: " + v.Address
-                        )
-                        .addTo(map);
+                            .bindPopup(
+                                "<b>Xe: " + v.Plate + "</b><br>" +
+                                "Tài xế: " + v.DriverName + "<br>" +
+                                "Tốc độ: " + v.Speed + " km/h<br>" +
+                                "Lần cập nhật: " + v.TimeUpdate + "<br>" +
+                                "Địa chỉ: " + v.Address
+                            )
+                            .addTo(map);
 
-                    markers[v.Id] = marker;
-                });
+                        markers[v.Id] = marker;
+                    });
 
-            })
-            .catch(err => console.error("GPS error:", err));
-    }
-</script>
+                })
+                .catch(function (err) { console.error("GPS error:", err); });
+        }
+    </script>
 </body>
+
 </html>
