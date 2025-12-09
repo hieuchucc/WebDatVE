@@ -4,7 +4,7 @@ const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // From mặc định – nếu quên set MAIL_FROM thì vẫn có cái dùng
-const DEFAULT_FROM = 'bavextructuyen <no-reply@hieuchu.site>';
+const DEFAULT_FROM = 'bavextructuyen <@hieuchu.site>';
 
 // Helper: build HTML đẹp đẹp chút
 function buildTicketHtml(booking) {
