@@ -607,7 +607,6 @@
     Authorization: 'Bearer ' + token()
   });
   const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => document.querySelectorAll(sel);
 
   const empNameEl = $('#empName');
   const btnLogout = $('#btnLogout');
@@ -712,16 +711,20 @@
       tripMsg.textContent = `Có ${items.length} chuyến. Nhấn "Xem vé" để xem danh sách khách.`;
       totalTripsEl.textContent = items.length;
       
-      tbTrips.innerHTML = items.map(t => `
+      tbTrips.innerHTML = items.map(t => {
+        const bookedCount = Array.isArray(t.seatsBooked) ? t.seatsBooked.length : (t.seatsBooked || 0);
+        const totalSeats  = t.seatsTotal || 0;
+        const ratio = totalSeats ? (bookedCount / totalSeats) * 100 : 0;
+        return `
         <tr class="trip-row" data-id="${t._id}">
           <td class="fw-semibold">${t.routeCode}</td>
           <td>${t.dateStr}</td>
           <td><span class="fw-bold text-primary">${t.departHM || ''}</span></td>
           <td>
-            <span class="fw-semibold">${(t.seatsBooked || 0)}/${t.seatsTotal || 0}</span>
+            <span class="fw-semibold">${bookedCount}/${totalSeats}</span>
             <div class="progress mt-1" style="height: 4px;">
-              <div class="progress-bar ${t.seatsBooked/t.seatsTotal > 0.8 ? 'bg-warning' : 'bg-success'}" 
-                   style="width: ${(t.seatsBooked/t.seatsTotal)*100}%"></div>
+              <div class="progress-bar ${ratio > 80 ? 'bg-warning' : 'bg-success'}" 
+                   style="width: ${ratio}%;"></div>
             </div>
           </td>
           <td>
@@ -735,7 +738,7 @@
             </button>
           </td>
         </tr>
-      `).join('');
+      `}).join('');
 
       tbTrips.querySelectorAll('.btn-view-trip').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -743,8 +746,9 @@
           const trip = items.find(x => x._id === id);
           if (trip) {
             currentTrip = trip;
+            const bookedCount = Array.isArray(trip.seatsBooked) ? trip.seatsBooked.length : (trip.seatsBooked || 0);
             currentTripInfo.textContent =
-              `${trip.routeCode} · ${trip.dateStr} · ${trip.departHM || ''} · ${trip.seatsBooked || 0}/${trip.seatsTotal || 0} ghế`;
+              `${trip.routeCode} · ${trip.dateStr} · ${trip.departHM || ''} · ${bookedCount}/${trip.seatsTotal || 0} ghế`;
             loadBookingsForTrip(trip._id);
           }
         });
@@ -895,10 +899,17 @@
 
       shuttleMsg.textContent = `Có ${items.length} xe trung chuyển. Nhấn "Xem khách" để xem danh sách.`;
 
-      tbShuttles.innerHTML = items.map(s => `
+      tbShuttles.innerHTML = items.map(s => {
+        const hasLocation = typeof s.currentLat === 'number' && typeof s.currentLng === 'number';
+        const statusBadge = hasLocation
+          ? '<span class="badge bg-info text-dark">Đã cập nhật vị trí</span>'
+          : '<span class="badge bg-secondary">Chưa cập nhật vị trí</span>';
+
+        return `
         <tr data-id="${s._id}">
           <td>
             <div class="fw-semibold">${s.plateNumber}</div>
+            ${s.capacity ? `<div class="muted">Sức chứa: ${s.capacity} khách</div>` : ''}
           </td>
           <td>
             <div class="fw-semibold">${s.driverName}</div>
@@ -906,22 +917,14 @@
           </td>
           <td>${s.mainRouteCode || '-'}</td>
           <td>${s.workingDateStr || ''}</td>
-          <td>
-            ${
-              s.status === 'on_route'
-                ? '<span class="badge bg-info text-dark">Đang đi đón</span>'
-                : s.status === 'idle'
-                  ? '<span class="badge bg-success">Rảnh</span>'
-                  : '<span class="badge bg-secondary">Tạm nghỉ</span>'
-            }
-          </td>
+          <td>${statusBadge}</td>
           <td class="text-end">
             <button class="btn btn-sm btn-outline-primary btn-view-shuttle" data-id="${s._id}">
               <i class="bi bi-people"></i> Xem khách
             </button>
           </td>
         </tr>
-      `).join('');
+      `}).join('');
 
       tbShuttles.querySelectorAll('.btn-view-shuttle').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1066,12 +1069,12 @@
     await loadShuttles();
   });
 
-  $('#btnLoadTrips').addEventListener('click', async () => {
+  document.getElementById('btnLoadTrips').addEventListener('click', async () => {
     await loadTrips();
-    await loadShuttles(); // cùng thay đổi theo ngày
+    await loadShuttles(); // đổi ngày => trung chuyển cũng đổi theo
   });
 
-  $('#btnLoadShuttles').addEventListener('click', loadShuttles);
+  document.getElementById('btnLoadShuttles').addEventListener('click', loadShuttles);
 
   btnLogout.addEventListener('click', async () => {
     try {
