@@ -453,10 +453,15 @@
                     return 'cancelled';
                 }
 
-                var depIso = booking.departureTime || (booking.trip && (booking.trip.departureTime || booking.trip.departAt));
-                if (!depIso) {
-                    return 'other';
+                // dùng trip.departAt làm chuẩn
+                var depIso = null;
+                if (booking.trip) {
+                    if (booking.trip.departAt) depIso = booking.trip.departAt;
+                    else if (booking.trip.departureTime) depIso = booking.trip.departureTime;
                 }
+                if (!depIso && booking.departureTime) depIso = booking.departureTime;
+
+                if (!depIso) return 'other';
 
                 var now = new Date();
                 var dep = new Date(depIso);
@@ -482,18 +487,22 @@
                 return 'Khác';
             }
 
-            // Kiểm tra xem vé này có đủ điều kiện để hiển thị nút Hủy hay không
+            // Kiểm tra vé có được hủy không
             function canCancelBooking(bk) {
                 if (!bk) return false;
 
-                // Không hủy nếu đã hủy, đã hoàn thành, đã check-in
+                // Không hủy nếu đã hủy / đã hoàn thành / đã check-in
                 if (bk.status === 'cancelled' || bk.status === 'completed' || bk.checkedIn) {
                     return false;
                 }
 
-                var depIso =
-                    bk.departureTime ||
-                    (bk.trip && (bk.trip.departureTime || bk.trip.departAt));
+                // Lấy giờ khởi hành: ưu tiên trip.departAt
+                var depIso = null;
+                if (bk.trip) {
+                    if (bk.trip.departAt) depIso = bk.trip.departAt;
+                    else if (bk.trip.departureTime) depIso = bk.trip.departureTime;
+                }
+                if (!depIso && bk.departureTime) depIso = bk.departureTime;
 
                 if (!depIso) return false;
 
@@ -504,7 +513,7 @@
                 var diffMs = dep.getTime() - now.getTime();
                 var diffHours = diffMs / (1000 * 60 * 60);
 
-                // Ràng buộc: phải còn ít nhất 2 giờ
+                // chỉ KHÔNG cho hủy nếu còn < 2 giờ
                 if (diffHours < 2) return false;
 
                 return true;
@@ -559,8 +568,22 @@
 
                 // Sort theo thời gian khởi hành (mới -> cũ)
                 currentBookings.sort(function (a, b) {
-                    var aDep = new Date(a.departureTime || (a.trip && (a.trip.departureTime || a.trip.departAt)) || a.createdAt || 0).getTime();
-                    var bDep = new Date(b.departureTime || (b.trip && (b.trip.departureTime || b.trip.departAt)) || b.createdAt || 0).getTime();
+                    var aDep = 0;
+                    if (a.trip) {
+                        if (a.trip.departAt) aDep = new Date(a.trip.departAt).getTime();
+                        else if (a.trip.departureTime) aDep = new Date(a.trip.departureTime).getTime();
+                    } else if (a.departureTime) {
+                        aDep = new Date(a.departureTime).getTime();
+                    }
+
+                    var bDep = 0;
+                    if (b.trip) {
+                        if (b.trip.departAt) bDep = new Date(b.trip.departAt).getTime();
+                        else if (b.trip.departureTime) bDep = new Date(b.trip.departureTime).getTime();
+                    } else if (b.departureTime) {
+                        bDep = new Date(b.departureTime).getTime();
+                    }
+
                     return bDep - aDep;
                 });
 
@@ -577,7 +600,13 @@
                     var routeName = bk.routeName ||
                         ((trip.from && trip.to) ? (trip.from + ' - ' + trip.to) : 'Chưa rõ tuyến');
 
-                    var depIso = bk.departureTime || trip.departureTime || trip.departAt;
+                    var depIso = null;
+                    if (trip) {
+                        if (trip.departAt) depIso = trip.departAt;
+                        else if (trip.departureTime) depIso = trip.departureTime;
+                    }
+                    if (!depIso && bk.departureTime) depIso = bk.departureTime;
+
                     var depText = formatDateTime(depIso);
 
                     var pickup = (bk.customer && bk.customer.pickupPoint) ?
@@ -699,6 +728,7 @@
 
                         alert(body.message || 'Hủy vé thành công.');
 
+                        // cập nhật local data
                         for (var i = 0; i < currentBookings.length; i++) {
                             var bk = currentBookings[i];
                             if (bk._id === id || bk.id === id) {
