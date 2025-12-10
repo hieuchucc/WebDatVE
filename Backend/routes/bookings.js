@@ -173,13 +173,11 @@ router.get('/lookup', async(req, res) => {
         return res.status(500).json({ ok: false, message: 'Server error' });
     }
 });
-router.post('/:id/cancel',  async (req, res, next) => {
+router.post('/:id/cancel', async (req, res, next) => {
   try {
     const bookingId = req.params.id;
 
-   
     const booking = await Booking.findById(bookingId).populate('tripId');
-
     if (!booking) {
       return res.status(404).json({
         success: false,
@@ -187,20 +185,19 @@ router.post('/:id/cancel',  async (req, res, next) => {
       });
     }
 
+    // Không cho hủy nếu đã hủy / đã hoàn thành / đã check-in
     if (booking.status === 'cancelled') {
       return res.status(400).json({
         success: false,
         message: 'Vé này đã được hủy trước đó',
       });
     }
-
     if (booking.status === 'completed') {
       return res.status(400).json({
         success: false,
         message: 'Không thể hủy vé đã hoàn thành chuyến',
       });
     }
-
     if (booking.checkedIn) {
       return res.status(400).json({
         success: false,
@@ -217,34 +214,39 @@ router.post('/:id/cancel',  async (req, res, next) => {
     }
 
     const now = new Date();
-    const departTime = new Date(trip.departAt); 
+    const departTime = new Date(trip.departAt);
 
     const diffMs = departTime - now;
     const diffHours = diffMs / (1000 * 60 * 60);
 
+    // ❗ ĐIỀU KIỆN GIỚI HẠN:
+    // CHỈ KHÔNG CHO HỦY nếu thời gian còn lại < 2 giờ (hoặc đã chạy/đã quá giờ)
     if (diffHours < CANCEL_BEFORE_HOURS) {
       return res.status(400).json({
         success: false,
-        message: `Chỉ được hủy vé trước giờ khởi hành ít nhất ${CANCEL_BEFORE_HOURS} giờ`,
+        message: `Chỉ được hủy vé trước giờ khởi hành tối thiểu ${CANCEL_BEFORE_HOURS} giờ`,
       });
     }
 
+    // Trả ghế
     if (Array.isArray(booking.seatCodes) && booking.seatCodes.length > 0) {
       const seatSetToRemove = new Set(booking.seatCodes);
-
       const newSeatsBooked = (trip.seatsBooked || []).filter(
         (code) => !seatSetToRemove.has(code)
       );
-
       trip.seatsBooked = newSeatsBooked;
       await trip.save();
     }
 
+    // Cập nhật trạng thái booking
     booking.status = 'cancelled';
 
+    // 💰 Nếu đã thanh toán thành công vẫn cho hủy
+    // => set payment.status = 'refunded' (coi như đã hoàn tiền)
     if (booking.payment && booking.payment.status === 'paid') {
       booking.payment.status = 'refunded';
-      booking.payment.refundedAt = new Date(); 
+      // Nếu muốn lưu thời gian hoàn tiền thì thêm field refundedAt trong PaymentSchema
+      booking.payment.refundedAt = new Date();
     }
 
     await booking.save();
@@ -256,13 +258,6 @@ router.post('/:id/cancel',  async (req, res, next) => {
         id: booking._id,
         status: booking.status,
         paymentStatus: booking.payment?.status,
-        trip: {
-          id: trip._id,
-          routeCode: trip.routeCode,
-          dateStr: trip.dateStr,
-          departHM: trip.departHM,
-        },
-        seatCodes: booking.seatCodes,
       },
     });
   } catch (err) {
@@ -271,3 +266,4 @@ router.post('/:id/cancel',  async (req, res, next) => {
 });
 
 module.exports = router;
+
