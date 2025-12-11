@@ -626,6 +626,15 @@
                     var paymentBadge = getPaymentStatusBadge(payment.status);
                     var bookingBadge = getBookingStatusBadge(bk.status);
 
+                    // =========================
+                    // NÚT XEM MAP: khóa khi đã đi
+                    // =========================
+                    var isPast = (timeStatus === 'past' || bk.status === 'completed');
+
+                    var mapBtn = isPast
+                        ? '<button class="btn btn-sm btn-secondary mt-2" disabled>🗺️ Đã khóa (chuyến đã hoàn tất)</button>'
+                        : '<button onclick="openMap()" class="btn btn-sm btn-outline-primary mt-2">🗺️ Xem vị trí xe</button>';
+
                     var seatsHtml = '';
                     for (var j = 0; j < seatCodes.length; j++) {
                         seatsHtml += '<span class="seat-pill me-1 mb-1">' + seatCodes[j] + '</span>';
@@ -674,7 +683,7 @@
                         '  </div>' +
 
                         '  <div class="mt-2 d-flex flex-wrap gap-2">' +
-                        '    <button onclick="openMap()" class="btn btn-sm btn-outline-primary">🗺️ Xem vị trí xe</button>' +
+                             mapBtn +
                         (canCancel
                             ? '    <button class="btn btn-sm btn-outline-danger btn-cancel-ticket" data-id="' + ticketCode + '">Hủy vé</button>'
                             : '') +
@@ -856,182 +865,182 @@
         // MAP + GPS REALTIME
         // ========================
         var map = null;
-var markers = {};
-var userMarker = null;
-var firstFocusDone = false;
-var historyPaths = {}; // dấu vết di chuyển của từng xe
+        var markers = {};
+        var userMarker = null;
+        var firstFocusDone = false;
+        var historyPaths = {}; // dấu vết di chuyển của từng xe
 
-// API ADSUN
-var adsunUrl = "https://shareapi.adsun.vn/Vehicle/GpsInfos?pageIds=3036&username=letananh&pwd=12345";
+        // API ADSUN
+        var adsunUrl = "https://shareapi.adsun.vn/Vehicle/GpsInfos?pageIds=3036&username=letananh&pwd=12345";
 
-/* ============================================================
-                  ICON XE THEO TRẠNG THÁI
-============================================================ */
-function getCarIcon(speed, lastUpdate) {
-    var color = "#00cc44"; // đang chạy
+        /* ============================================================
+                          ICON XE THEO TRẠNG THÁI
+        ============================================================ */
+        function getCarIcon(speed, lastUpdate) {
+            var color = "#00cc44"; // đang chạy
 
-    if (speed === 0) {
-        var diffMin = (Date.now() - new Date(lastUpdate)) / 60000;
-        color = diffMin > 10 ? "#ff66cc" : "#ff3333"; // đỗ lâu / dừng
-    }
+            if (speed === 0) {
+                var diffMin = (Date.now() - new Date(lastUpdate)) / 60000;
+                color = diffMin > 10 ? "#ff66cc" : "#ff3333"; // đỗ lâu / dừng
+            }
 
-    return L.divIcon({
-        html:
-            '<svg width="28" height="28" viewBox="0 0 24 24" fill="' +
-            color +
-            '" stroke="black" stroke-width="1.2">' +
-            '<path d="M5 11L3 17H4L5 20H7L8 17H16L17 20H19L20 17H21L19 11L15 7H9L5 11Z"/></svg>',
-        className: "",
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-    });
-}
-
-/* ============================================================
-                        KHỞI TẠO MAP
-============================================================ */
-function initLeafletMap() {
-    if (!map) {
-        map = L.map("map").setView([10.75, 106.66], 11);
-
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            maxZoom: 19,
-            attribution: "&copy; OpenStreetMap contributors",
-        }).addTo(map);
-    }
-
-    loadGpsLeaflet();
-    trackUserLocation();
-
-    setInterval(loadGpsLeaflet, 5000);
-}
-
-/* ============================================================
-          OPEN MODAL → RESET ZOOM & KHỞI TẠO MAP
-============================================================ */
-function openMap() {
-    var modalEl = document.getElementById("mapModal");
-    var modal = new bootstrap.Modal(modalEl);
-    modal.show();
-
-    firstFocusDone = false; // reset lại zoom lần đầu
-
-    setTimeout(function () {
-        initLeafletMap();
-    }, 300);
-}
-
-/* ============================================================
-         LOAD GPS + POPUP + ANIMATION + HISTORY TRAIL
-============================================================ */
-function loadGpsLeaflet() {
-    fetch(adsunUrl)
-        .then(function (res) {
-            return res.json();
-        })
-        .then(function (result) {
-            var data = result.Data || [];
-
-            data.forEach(function (v, index) {
-                if (!v.Lat || !v.Lng) return;
-
-                var pos = [v.Lat, v.Lng];
-                var icon = getCarIcon(v.Speed, v.TimeUpdate);
-
-                var popupHtml =
-                    "<b>Xe: " + v.Plate + "</b><br>" +
-                    "Tài xế: " + v.DriverName + "<br>" +
-                    "Tốc độ: " + v.Speed + " km/h<br>" +
-                    "Lần cập nhật: " + v.TimeUpdate + "<br>" +
-                    "Địa chỉ: " + v.Address;
-
-                /* ============================
-                      DẤU VẾT DI CHUYỂN
-                ============================ */
-                if (!historyPaths[v.Id]) {
-                    historyPaths[v.Id] = L.polyline([pos], { color: "#3388ff", weight: 3 }).addTo(map);
-                } else {
-                    historyPaths[v.Id].addLatLng(pos);
-                }
-
-                /* ============================
-                       UPDATE HOẶC TẠO MARKER
-                ============================ */
-
-                if (markers[v.Id]) {
-                    // Nếu xe di chuyển → animate
-                    if (v.Speed > 2) {
-                        animateMarker(markers[v.Id], L.latLng(pos));
-                    } else {
-                        markers[v.Id].setLatLng(pos);
-                    }
-
-                    // Icon + popup realtime
-                    markers[v.Id].setIcon(icon);
-
-                    if (markers[v.Id].getPopup()) {
-                        markers[v.Id].getPopup().setContent(popupHtml);
-                    } else {
-                        markers[v.Id].bindPopup(popupHtml);
-                    }
-                } else {
-                    // Tạo marker mới
-                    markers[v.Id] = L.marker(pos, { icon: icon })
-                        .addTo(map)
-                        .bindPopup(popupHtml)
-                        .openPopup(); // mở popup lần đầu
-                }
-
-                /* ============================
-                       ZOOM LẦN ĐẦU TIÊN
-                ============================ */
-                if (!firstFocusDone && index === 0) {
-                    map.setView(pos, 14);
-                    firstFocusDone = true;
-                }
+            return L.divIcon({
+                html:
+                    '<svg width="28" height="28" viewBox="0 0 24 24" fill="' +
+                    color +
+                    '" stroke="black" stroke-width="1.2">' +
+                    '<path d="M5 11L3 17H4L5 20H7L8 17H16L17 20H19L20 17H21L19 11L15 7H9L5 11Z"/></svg>',
+                className: "",
+                iconSize: [28, 28],
+                iconAnchor: [14, 14],
             });
-        })
-        .catch(function (err) {
-            console.error("GPS error:", err);
-        });
-}
+        }
 
-/* ============================================================
-                HIỆU ỨNG DI CHUYỂN MƯỢT
-============================================================ */
-function animateMarker(marker, newPos) {
-    var oldPos = marker.getLatLng();
-    var steps = 20;
-    var step = 0;
+        /* ============================================================
+                                KHỞI TẠO MAP
+        ============================================================ */
+        function initLeafletMap() {
+            if (!map) {
+                map = L.map("map").setView([10.75, 106.66], 11);
 
-    var latStep = (newPos.lat - oldPos.lat) / steps;
-    var lngStep = (newPos.lng - oldPos.lng) / steps;
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    maxZoom: 19,
+                    attribution: "&copy; OpenStreetMap contributors",
+                }).addTo(map);
+            }
 
-    var interval = setInterval(function () {
-        step++;
-        marker.setLatLng([
-            oldPos.lat + latStep * step,
-            oldPos.lng + lngStep * step,
-        ]);
-        if (step >= steps) clearInterval(interval);
-    }, 40);
-}
+            loadGpsLeaflet();
+            trackUserLocation();
 
-/* ============================================================
-              THEO DÕI VỊ TRÍ NGƯỜI DÙNG REALTIME
-============================================================ */
-function trackUserLocation() {
-    if (!navigator.geolocation) return;
+            setInterval(loadGpsLeaflet, 5000);
+        }
 
-    navigator.geolocation.watchPosition(
-        function (pos) {
-            var lat = pos.coords.latitude;
-            var lng = pos.coords.longitude;
+        /* ============================================================
+                  OPEN MODAL → RESET ZOOM & KHỞI TẠO MAP
+        ============================================================ */
+        function openMap() {
+            var modalEl = document.getElementById("mapModal");
+            var modal = new bootstrap.Modal(modalEl);
+            modal.show();
 
-            if (!userMarker) {
-                userMarker = L.marker([lat, lng], {
-                    icon: L.divIcon({
-                        html: `
+            firstFocusDone = false; // reset lại zoom lần đầu
+
+            setTimeout(function () {
+                initLeafletMap();
+            }, 300);
+        }
+
+        /* ============================================================
+                 LOAD GPS + POPUP + ANIMATION + HISTORY TRAIL
+        ============================================================ */
+        function loadGpsLeaflet() {
+            fetch(adsunUrl)
+                .then(function (res) {
+                    return res.json();
+                })
+                .then(function (result) {
+                    var data = result.Data || [];
+
+                    data.forEach(function (v, index) {
+                        if (!v.Lat || !v.Lng) return;
+
+                        var pos = [v.Lat, v.Lng];
+                        var icon = getCarIcon(v.Speed, v.TimeUpdate);
+
+                        var popupHtml =
+                            "<b>Xe: " + v.Plate + "</b><br>" +
+                            "Tài xế: " + v.DriverName + "<br>" +
+                            "Tốc độ: " + v.Speed + " km/h<br>" +
+                            "Lần cập nhật: " + v.TimeUpdate + "<br>" +
+                            "Địa chỉ: " + v.Address;
+
+                        /* ============================
+                              DẤU VẾT DI CHUYỂN
+                        ============================ */
+                        if (!historyPaths[v.Id]) {
+                            historyPaths[v.Id] = L.polyline([pos], { color: "#3388ff", weight: 3 }).addTo(map);
+                        } else {
+                            historyPaths[v.Id].addLatLng(pos);
+                        }
+
+                        /* ============================
+                               UPDATE HOẶC TẠO MARKER
+                        ============================ */
+
+                        if (markers[v.Id]) {
+                            // Nếu xe di chuyển → animate
+                            if (v.Speed > 2) {
+                                animateMarker(markers[v.Id], L.latLng(pos));
+                            } else {
+                                markers[v.Id].setLatLng(pos);
+                            }
+
+                            // Icon + popup realtime
+                            markers[v.Id].setIcon(icon);
+
+                            if (markers[v.Id].getPopup()) {
+                                markers[v.Id].getPopup().setContent(popupHtml);
+                            } else {
+                                markers[v.Id].bindPopup(popupHtml);
+                            }
+                        } else {
+                            // Tạo marker mới
+                            markers[v.Id] = L.marker(pos, { icon: icon })
+                                .addTo(map)
+                                .bindPopup(popupHtml)
+                                .openPopup(); // mở popup lần đầu
+                        }
+
+                        /* ============================
+                               ZOOM LẦN ĐẦU TIÊN
+                        ============================ */
+                        if (!firstFocusDone && index === 0) {
+                            map.setView(pos, 14);
+                            firstFocusDone = true;
+                        }
+                    });
+                })
+                .catch(function (err) {
+                    console.error("GPS error:", err);
+                });
+        }
+
+        /* ============================================================
+                        HIỆU ỨNG DI CHUYỂN MƯỢT
+        ============================================================ */
+        function animateMarker(marker, newPos) {
+            var oldPos = marker.getLatLng();
+            var steps = 20;
+            var step = 0;
+
+            var latStep = (newPos.lat - oldPos.lat) / steps;
+            var lngStep = (newPos.lng - oldPos.lng) / steps;
+
+            var interval = setInterval(function () {
+                step++;
+                marker.setLatLng([
+                    oldPos.lat + latStep * step,
+                    oldPos.lng + lngStep * step,
+                ]);
+                if (step >= steps) clearInterval(interval);
+            }, 40);
+        }
+
+        /* ============================================================
+                      THEO DÕI VỊ TRÍ NGƯỜI DÙNG REALTIME
+        ============================================================ */
+        function trackUserLocation() {
+            if (!navigator.geolocation) return;
+
+            navigator.geolocation.watchPosition(
+                function (pos) {
+                    var lat = pos.coords.latitude;
+                    var lng = pos.coords.longitude;
+
+                    if (!userMarker) {
+                        userMarker = L.marker([lat, lng], {
+                            icon: L.divIcon({
+                                html: `
                             <div style="
                                 width: 20px;
                                 height: 20px;
@@ -1041,23 +1050,23 @@ function trackUserLocation() {
                                 box-shadow: 0 0 8px #007bff;">
                             </div>
                         `,
-                        className: "",
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10],
-                    }),
-                })
-                    .addTo(map)
-                    .bindPopup("Vị trí của bạn");
-            } else {
-                userMarker.setLatLng([lat, lng]);
-            }
-        },
-        function (err) {
-            console.log("Không lấy được vị trí user:", err);
-        },
-        { enableHighAccuracy: true }
-    );
-}
+                                className: "",
+                                iconSize: [20, 20],
+                                iconAnchor: [10, 10],
+                            }),
+                        })
+                            .addTo(map)
+                            .bindPopup("Vị trí của bạn");
+                    } else {
+                        userMarker.setLatLng([lat, lng]);
+                    }
+                },
+                function (err) {
+                    console.log("Không lấy được vị trí user:", err);
+                },
+                { enableHighAccuracy: true }
+            );
+        }
     </script>
 </body>
 
