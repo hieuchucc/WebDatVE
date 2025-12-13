@@ -178,12 +178,12 @@ header h1 {
 /* ---------- Banner chính ---------- */
 
 .banner {
-    position: relative;
-    min-height: 52vh;
-    background: url('https://img1.oto.com.vn/2024/01/18/solati-a40c-e915_wm.webp') center/cover no-repeat;
-    border-bottom-left-radius: var(--radius-2xl);
-    border-bottom-right-radius: var(--radius-2xl);
-    overflow: hidden;
+  position: relative;
+  min-height: 52vh;
+  background: url("https://img1.oto.com.vn/2024/01/18/solati-a40c-e915_wm.webp") center center / cover no-repeat;
+  border-bottom-left-radius: var(--radius-2xl);
+  border-bottom-right-radius: var(--radius-2xl);
+  overflow: hidden;
 }
 
 .banner-overlay {
