@@ -11,334 +11,143 @@
 
     <!-- App Styles -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- ===== THÊM CSS BANNER (CÁCH 1 – DUY NHẤT) ===== -->
+    <style>
+        .banner {
+            background: url('https://img1.oto.com.vn/2024/01/18/solati-a40c-e915_wm.webp') center / cover no-repeat;
+            min-height: 520px;
+            position: relative;
+            color: #fff;
+        }
+
+        .banner-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 1;
+        }
+
+        .banner-content {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
 </head>
 
-<body>
-    <!-- Nút Admin (ẩn, chỉ hiện khi role = admin) -->
+<body id="top">
+
+    <!-- Nút Admin -->
     <a id="adminLink" href="admin.html" class="btn btn-warning rounded-pill px-3 d-none">Admin</a>
     <a id="employeeLink" href="employee.html" class="btn btn-info rounded-pill px-3 d-none">Nhân viên</a>
 
-    <!-- Header / Navbar -->
+    <!-- Header -->
     <header class="bg-primary text-white p-3">
         <div class="container d-flex justify-content-between align-items-center">
-            <!-- Logo + Brand -->
-            <div class="left-section d-flex align-items-center">
-                <a href="#top" class="brand-logo" aria-label="Về đầu trang">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdk1KSWlpLDRMeHJM6uZpOhHTWgzEzgDuU6ZKf1go82QKatnJwwUWcGVz3nC1JHMUHa34&usqp=CAU" class="logo" alt="Logo Du Lịch Ba Duy">
+            <div class="d-flex align-items-center">
+                <a href="#top">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdk1KSWlpLDRMeHJM6uZpOhHTWgzEzgDuU6ZKf1go82QKatnJwwUWcGVz3nC1JHMUHa34&usqp=CAU"
+                        height="48" class="me-2">
                 </a>
-                <h1 class="m-0 brand-title">Du Lịch Ba Duy</h1>
+                <h1 class="h4 m-0">Du Lịch Ba Duy</h1>
             </div>
 
-            <!-- User / Actions -->
-            <div id="userSection" class="right-section d-flex align-items-center gap-2">
-                <!-- Tra cứu vé -->
-                <a href="check-booking.html" class="btn btn-primary rounded-pill px-3 text-white">Tra cứu vé</a>
-
-                <!-- Hiển thị tên người dùng sau khi đăng nhập -->
-                <span id="userName" class="me-2 fw-bold text-white d-none"></span>
-
-                <!-- Đăng xuất -->
-                <button id="logoutBtn" class="btn btn-danger rounded-pill px-3 d-none" type="button">Đăng Xuất</button>
-
-                <!-- Đăng nhập / Đăng ký (khi chưa đăng nhập) -->
-                <a id="loginBtn" href="login.html" class="btn btn-primary rounded-pill px-3">Đăng Nhập</a>
-                <a id="registerBtn" href="register.html" class="btn btn-success rounded-pill px-3">Đăng Ký</a>
-
-                <!-- Hotline dropdown -->
-                <div class="dropdown">
-                    <button class="btn btn-light rounded-pill d-flex align-items-center gap-2 px-4 py-2" type="button" id="hotlineDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.1rem; font-weight: 600;">
-            <img src="https://cdn-icons-png.freepik.com/512/3488/3488550.png" alt="Phone Icon" width="28" height="28"
-              class="rounded-circle bg-white p-1 shadow-sm" style="object-fit:contain;">
-            Hotline 24/7
-          </button>
-
-                    <ul class="dropdown-menu p-3" aria-labelledby="hotlineDropdown" style="min-width:280px;">
-                        <li>
-                            <a class="dropdown-item" href="tel:0123456789">
-                                <div class="fw-bold">0123456789</div>
-                                <small class="text-muted">Phản hồi dịch vụ & xử lý sự cố</small>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="tel:0123456789">
-                                <div class="fw-bold">0123456789</div>
-                                <small class="text-muted">Đặt vé qua điện thoại (24/7)</small>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="check-booking.html" class="btn btn-light rounded-pill">Tra cứu vé</a>
+                <span id="userName" class="fw-bold text-white d-none"></span>
+                <button id="logoutBtn" class="btn btn-danger rounded-pill d-none" type="button">Đăng xuất</button>
+                <a id="loginBtn" href="login.html" class="btn btn-outline-light rounded-pill">Đăng nhập</a>
+                <a id="registerBtn" href="register.html" class="btn btn-warning rounded-pill">Đăng ký</a>
             </div>
         </div>
     </header>
 
-    <!-- Hero Banner -->
+    <!-- ===== BANNER (GIỮ HTML CŨ) ===== -->
     <section class="banner text-center d-flex align-items-center justify-content-center">
         <div class="banner-overlay"></div>
         <div class="banner-content">
-            <h2 class="display-5 display-md-4">Đặt Vé Xe Trực Tuyến Nhanh Chóng</h2>
+            <h2 class="display-5 fw-bold">Đặt Vé Xe Trực Tuyến Nhanh Chóng</h2>
             <p class="lead">Tìm chuyến dễ dàng · Giá vé minh bạch · Thanh toán an toàn</p>
-
             <a href="#searchSection" class="btn btn-warning btn-lg mt-3">Đặt Vé Ngay</a>
         </div>
     </section>
 
-    <!-- Search Box -->
+    <!-- ===== SEARCH ===== -->
     <section class="search-section py-5" id="searchSection">
         <div class="container">
-            <h2 class="text-center mb-4 text-primary section-title">Tìm Kiếm Chuyến Xe</h2>
-            <div class="search-box p-4 rounded-3 shadow-sm bg-white">
-                <form id="searchForm" class="row g-3 align-items-end justify-content-center">
-                    <!-- Tuyến đường -->
-                    <div class="col-md-3">
-                        <label for="route" class="form-label"><strong>Chọn tuyến đường</strong></label>
-                        <select id="route" class="form-select" required>
-              <option value="">Chọn tuyến đường</option>
-              <option value="Lagi - TP. Hồ Chí Minh">Lagi - TP. Hồ Chí Minh</option>
-              <option value="Lagi - Đà Lạt">Lagi - Đà Lạt</option>
-              <option value="Lagi - Nha Trang">Lagi - Nha Trang</option>
-            </select>
-                    </div>
-                    <!-- Điểm đón -->
-                    <div class="col-md-3">
-                        <label for="departure" class="form-label"><strong>Điểm đón</strong></label>
-                        <input type="text" id="departure" class="form-control" placeholder="Chọn điểm đón" list="pickupPoints" required>
-                        <datalist id="pickupPoints"></datalist>
-                    </div>
-                    <!-- Điểm đến -->
-                    <div class="col-md-3">
-                        <label for="destination" class="form-label"><strong>Điểm đến</strong></label>
-                        <input type="text" id="destination" class="form-control" placeholder="Chọn điểm đến" list="dropOffPoints" required>
-                        <datalist id="dropOffPoints"></datalist>
-                    </div>
-                    <!-- Ngày đi -->
-                    <div class="col-md-3">
-                        <label for="date" class="form-label"><strong>Ngày đi</strong></label>
-                        <input type="date" id="date" class="form-control" required>
-                    </div>
-                    <!-- Button tìm -->
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-find-trip w-100">Tìm chuyến xe</button>
-                    </div>
-                </form>
-            </div>
+            <h2 class="text-center mb-4 text-primary">Tìm Kiếm Chuyến Xe</h2>
+            <form id="searchForm" class="row g-3 align-items-end justify-content-center">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Tuyến</label>
+                    <select id="route" class="form-select">
+                        <option value="">Chọn tuyến</option>
+                        <option>Lagi - TP. Hồ Chí Minh</option>
+                        <option>Lagi - Đà Lạt</option>
+                        <option>Lagi - Nha Trang</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Điểm đón</label>
+                    <input id="departure" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Điểm đến</label>
+                    <input id="destination" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Ngày đi</label>
+                    <input type="date" id="date" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100">Tìm chuyến</button>
+                </div>
+            </form>
         </div>
     </section>
 
-    <!-- Trip Results -->
+    <!-- ===== DANH SÁCH CHUYẾN ===== -->
     <section class="trip-list py-5">
         <div class="container">
-            <h2 class="text-center text-primary section-title">Danh Sách Chuyến Xe</h2>
-
-            <div id="tripResults">
-                <div class="trip-group">
-                    <div class="trip-group__header">
-                        <span class="dot dot--go"></span>
-                        <h3>Chiều đi</h3>
-                    </div>
-                    <div id="outboundResults" class="trip-grid"></div>
-                </div>
-
-                <div class="trip-group">
-                    <div class="trip-group__header">
-                        <span class="dot dot--back"></span>
-                        <h3>Chiều về</h3>
-                    </div>
-                    <div id="returnResults" class="trip-grid"></div>
-                </div>
-            </div>
+            <h2 class="text-center text-primary">Danh Sách Chuyến Xe</h2>
+            <div id="outboundResults"></div>
+            <div id="returnResults"></div>
         </div>
     </section>
 
-    <!-- Seat Modal -->
-    <div class="modal fade" id="seatModal" tabindex="-1" aria-hidden="true">
+    <!-- ===== MODAL GHẾ ===== -->
+    <div class="modal fade" id="seatModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-
-                <!-- header + 5 bước -->
-                <div class="modal-header flex-column align-items-start gap-2">
-                    <div class="d-flex w-100 justify-content-between align-items-center">
-                        <h5 class="modal-title mb-0">Chọn ghế (15 chỗ)</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <!-- thanh 5 bước -->
-                    <div class="d-flex align-items-center flex-wrap gap-2" style="font-size:.72rem">
-                        <!-- B1 -->
-                        <div class="d-flex align-items-center gap-1">
-                            <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width:26px;height:26px;background:rgba(10,160,110,.12);color:#0f766e;font-weight:600;">
-                1
-              </span>
-                            <span class="text-success fw-semibold">Chọn chuyến</span>
-                        </div>
-                        <span style="width:32px;height:2px;background:rgba(148,163,184,.35);"></span>
-                        <!-- B2 (active) -->
-                        <div class="d-flex align-items-center gap-1">
-                            <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width:26px;height:26px;background:#0A5AD7;color:white;font-weight:700;box-shadow:0 4px 10px rgba(10,90,215,.3);">
-                2
-              </span>
-                            <span class="fw-semibold" style="color:#0f172a;">Chọn ghế</span>
-                        </div>
-                        <span style="width:32px;height:2px;background:rgba(148,163,184,.35);"></span>
-                        <!-- B3 -->
-                        <div class="d-flex align-items-center gap-1 text-muted">
-                            <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width:26px;height:26px;background:#e2e8f0;color:#475569;font-weight:600;">
-                3
-              </span>
-                            <span>Thông tin</span>
-                        </div>
-                        <span style="width:32px;height:2px;background:rgba(148,163,184,.35);"></span>
-                        <!-- B4 -->
-                        <div class="d-flex align-items-center gap-1 text-muted">
-                            <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width:26px;height:26px;background:#e2e8f0;color:#475569;font-weight:600;">
-                4
-              </span>
-                            <span>Thanh toán</span>
-                        </div>
-                        <span style="width:32px;height:2px;background:rgba(148,163,184,.35);"></span>
-                        <!-- B5 -->
-                        <div class="d-flex align-items-center gap-1 text-muted">
-                            <span class="rounded-circle d-inline-flex justify-content-center align-items-center" style="width:26px;height:26px;background:#e2e8f0;color:#475569;font-weight:600;">
-                5
-              </span>
-                            <span>Hoàn tất</span>
-                        </div>
-                    </div>
+                <div class="modal-header">
+                    <h5 class="modal-title">Chọn ghế</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body">
-                    <div id="seatMeta" class="mb-2 text-muted"></div>
-                    <div id="seatGrid" class="d-flex flex-column gap-2"></div>
-                    <div class="mt-3 d-flex align-items-center justify-content-between">
-                        <div>
-                            <span class="badge bg-secondary me-2">Trống</span>
-                            <span class="badge bg-warning text-dark me-2">Đang giữ</span>
-                            <span class="badge bg-danger me-2">Đã bán</span>
-                            <span class="badge bg-primary">Đã chọn</span>
-                        </div>
-                        <button id="btnHold" class="btn btn-primary" disabled>Tiếp tục</button>
-                    </div>
-                    <div id="seatMsg" class="mt-2 small text-muted"></div>
+                    <div id="seatGrid"></div>
+                    <button id="btnHold" class="btn btn-primary mt-3" disabled>Tiếp tục</button>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <!-- ====== BẮT ĐẦU KHỐI ĐÁNH GIÁ DỊCH VỤ ====== -->
+    <!-- ===== REVIEW ===== -->
     <section class="reviews-wrapper" id="reviewsSection">
-        <div class="reviews-grid">
-            <!-- CỘT TRÁI: TỔNG HỢP + DANH SÁCH -->
-            <div class="reviews-left">
-                <!-- Tổng quan rating -->
-                <div class="rating-summary-card">
-                    <div class="rating-score">
-                        <span id="ratingAverage">0.0</span>
-                        <div class="rating-stars" id="ratingSummaryStars">
-                            <!-- sao sẽ render bằng JS -->
-                        </div>
-                        <p class="rating-label">Điểm trung bình</p>
-                    </div>
-                    <div class="rating-meta">
-                        <p class="rating-count">
-                            <span id="ratingCount">0</span> lượt đánh giá
-                        </p>
-                        <p class="rating-note">
-                            Từ những khách đã đặt vé và hoàn tất chuyến đi.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Header danh sách + filter -->
-                <div class="reviews-list-header">
-                    <div class="reviews-list-header-left">
-                        <h3>Ý kiến từ khách hàng</h3>
-                        <span id="reviewsListCountBadge" class="pill-badge">0 đánh giá</span>
-                    </div>
-                    <div class="reviews-list-header-right">
-                        <select id="reviewsStarFilter" class="reviews-filter-select">
-            <option value="0">Tất cả số sao</option>
-            <option value="5">Chỉ 5 sao</option>
-            <option value="4">Từ 4 sao trở lên</option>
-            <option value="3">Từ 3 sao trở lên</option>
-            <option value="2">Từ 2 sao trở lên</option>
-            <option value="1">Tất cả (1+)</option>
-          </select>
-                        <button type="button" id="reviewsToggleBtn" class="reviews-toggle-btn">
-            Xem tất cả
-          </button>
-                    </div>
-                </div>
-
-                <!-- Danh sách đánh giá -->
-                <div id="reviewsList" class="reviews-list"></div>
-                <div id="reviewsEmpty" class="reviews-empty" style="display:none;">
-                    Chưa có đánh giá nào. Hãy là người đầu tiên chia sẻ trải nghiệm của bạn!
-                </div>
-            </div>
-
-            <!-- CỘT PHẢI: FORM GỬI ĐÁNH GIÁ -->
-            <div class="reviews-right">
-                <h2 class="review-title">Chia sẻ trải nghiệm chuyến đi</h2>
-                <p class="review-subtitle">
-                    Đánh giá giúp Ba Duy Bus cải thiện chất lượng phục vụ. Chỉ khách đã từng đặt vé bằng số điện thoại này mới gửi được đánh giá.
-                </p>
-
-                <form id="reviewForm" class="review-form">
-                    <!-- SỐ ĐIỆN THOẠI -->
-                    <div class="form-group">
-                        <label for="rvPhone">Số điện thoại đã đặt vé <span class="required">*</span></label>
-                        <input type="tel" id="rvPhone" class="form-control" placeholder="VD: 0347 448 344" maxlength="15" />
-                        <small class="form-text-muted">
-            Hệ thống sẽ kiểm tra xem số này đã từng đặt và hoàn tất vé hay chưa.
-          </small>
-                    </div>
-
-                    <!-- ĐÁNH GIÁ SAO -->
-                    <div class="form-group">
-                        <label>Chất lượng dịch vụ <span class="required">*</span></label>
-                        <div class="rating-input">
-                            <input type="radio" id="star5" name="rating" value="5" checked />
-                            <label for="star5" title="Rất hài lòng">★</label>
-
-                            <input type="radio" id="star4" name="rating" value="4" />
-                            <label for="star4" title="Hài lòng">★</label>
-
-                            <input type="radio" id="star3" name="rating" value="3" />
-                            <label for="star3" title="Bình thường">★</label>
-
-                            <input type="radio" id="star2" name="rating" value="2" />
-                            <label for="star2" title="Chưa tốt">★</label>
-
-                            <input type="radio" id="star1" name="rating" value="1" />
-                            <label for="star1" title="Tệ">★</label>
-                        </div>
-                    </div>
-
-                    <!-- NỘI DUNG NHẬN XÉT -->
-                    <div class="form-group">
-                        <label for="rvComment">Nhận xét của bạn <span class="required">*</span></label>
-                        <textarea id="rvComment" class="form-control" rows="4" placeholder="Chia sẻ trải nghiệm chuyến đi của bạn..."></textarea>
-                    </div>
-
-                    <button type="submit" id="btnSubmitReview" class="btn-primary w-100">
-          Gửi đánh giá
-        </button>
-
-                    <div id="reviewMessage" class="review-message" style="display:none;"></div>
-                </form>
-            </div>
+        <div class="container py-5">
+            <h2 class="text-center">Đánh giá dịch vụ</h2>
+            <div id="reviewsList"></div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="bg-primary text-white text-center p-3">
-        &copy; Nhà Xe Ba Duy.
+        &copy; Nhà Xe Ba Duy
     </footer>
 
-    <!-- Bootstrap JS (bundle) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- App JS -->
-<script src="script.js"></script>
+    <!-- App JS -->
+    <script src="script.js"></script>
 
 <!-- Script xử lý đăng nhập / logout / hiển thị Admin -->
 <script>
