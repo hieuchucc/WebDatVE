@@ -8,8 +8,12 @@ function normalize(str = '') {
   return str
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')  
+    .replace(/\s+/g, ' ')
+    .trim();
 }
+
 
 const PLACE_KEYWORDS = {
   lagi: ['lagi', 'la gi', 'ham tan', 'hàm tân'],
