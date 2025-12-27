@@ -598,13 +598,12 @@
   </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   const API_BASE = 'https://webdatve.onrender.com';
   const token = () => localStorage.getItem('token');
   const authHeaders = () => ({
     'Content-Type': 'application/json',
-    Authorization: 'Bearer ' + token()
+    Authorization: 'Bearer ' + (token() || '')
   });
   const $ = (sel) => document.querySelector(sel);
 
@@ -635,7 +634,7 @@
   function fmtMoney(n) {
     return (Number(n || 0)).toLocaleString('vi-VN');
   }
-  
+
   function fmtDateLabel(d) {
     return d.toLocaleDateString('vi-VN', {
       weekday: 'long',
@@ -643,6 +642,22 @@
       month: '2-digit',
       year: 'numeric'
     });
+  }
+
+  // === helper: fetch có debug rõ lỗi (status + body)
+  async function fetchJson(url, options = {}) {
+    const res = await fetch(url, options);
+    let data = null;
+    try { data = await res.json(); } catch { data = null; }
+
+    if (!res.ok) {
+      const msg = (data && data.message) ? data.message : (res.statusText || 'Request failed');
+      const err = new Error(msg);
+      err.status = res.status;
+      err.data = data;
+      throw err;
+    }
+    return data;
   }
 
   async function requireEmployee() {
@@ -653,20 +668,21 @@
       return;
     }
     try {
-      const res = await fetch(API_BASE + '/api/auth/me', {
+      const me = await fetchJson(API_BASE + '/api/auth/me', {
         headers: authHeaders(),
         credentials: 'include'
       });
-      if (!res.ok) throw 0;
-      const me = await res.json();
+
       if (!me || me.role !== 'employee') {
         alert('Bạn không có quyền nhân viên.');
         location.href = 'index.html';
         return;
       }
+
       localStorage.setItem('user', JSON.stringify(me));
       empNameEl.textContent = me.username || me.email || 'Nhân viên';
-    } catch {
+    } catch (e) {
+      console.error('requireEmployee error:', e);
       alert('Phiên đăng nhập đã hết, vui lòng đăng nhập lại.');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -690,15 +706,10 @@
     }
 
     try {
-      const res = await fetch(API_BASE + '/api/employee/trips?date=' + encodeURIComponent(dateStr), {
-        headers: authHeaders(),
-        credentials: 'include'
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        tripMsg.textContent = data.message || 'Lỗi tải chuyến.';
-        return;
-      }
+      const data = await fetchJson(
+        API_BASE + '/api/employee/trips?date=' + encodeURIComponent(dateStr),
+        { headers: authHeaders(), credentials: 'include' }
+      );
 
       const items = data.items || data || [];
       if (!items.length) {
@@ -710,7 +721,7 @@
 
       tripMsg.textContent = `Có ${items.length} chuyến. Nhấn "Xem vé" để xem danh sách khách.`;
       totalTripsEl.textContent = items.length;
-      
+
       tbTrips.innerHTML = items.map(t => {
         const bookedCount = Array.isArray(t.seatsBooked) ? t.seatsBooked.length : (t.seatsBooked || 0);
         const totalSeats  = t.seatsTotal || 0;
@@ -723,14 +734,14 @@
           <td>
             <span class="fw-semibold">${bookedCount}/${totalSeats}</span>
             <div class="progress mt-1" style="height: 4px;">
-              <div class="progress-bar ${ratio > 80 ? 'bg-warning' : 'bg-success'}" 
+              <div class="progress-bar ${ratio > 80 ? 'bg-warning' : 'bg-success'}"
                    style="width: ${ratio}%;"></div>
             </div>
           </td>
           <td>
-            ${t.active ? 
-              '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Đang mở</span>' : 
-              '<span class="badge bg-secondary"><i class="bi bi-lock me-1"></i>Đã khóa</span>'}
+            ${t.active
+              ? '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Đang mở</span>'
+              : '<span class="badge bg-secondary"><i class="bi bi-lock me-1"></i>Đã khóa</span>'}
           </td>
           <td class="text-end">
             <button class="btn btn-sm btn-outline-primary btn-view-trip d-flex align-items-center gap-1" data-id="${t._id}">
@@ -754,8 +765,8 @@
         });
       });
     } catch (e) {
-      console.error(e);
-      tripMsg.textContent = 'Không kết nối được máy chủ.';
+      console.error('loadTrips error:', e);
+      tripMsg.textContent = `Không tải được chuyến. (HTTP ${e.status || '?'}) ${e.message || ''}`;
     }
   }
 
@@ -763,15 +774,11 @@
     bookingMsg.textContent = 'Đang tải danh sách vé...';
     tbBookings.innerHTML = '';
     try {
-      const res = await fetch(API_BASE + '/api/employee/trips/' + tripId + '/bookings', {
+      const data = await fetchJson(API_BASE + '/api/employee/trips/' + tripId + '/bookings', {
         headers: authHeaders(),
         credentials: 'include'
       });
-      const data = await res.json();
-      if (!res.ok) {
-        bookingMsg.textContent = data.message || 'Lỗi tải booking.';
-        return;
-      }
+
       const items = data.items || data || [];
       if (!items.length) {
         bookingMsg.textContent = 'Chưa có vé nào cho chuyến này.';
@@ -782,7 +789,7 @@
 
       bookingMsg.textContent = `Có ${items.length} vé.`;
       updateBookingStats(items);
-      
+
       tbBookings.innerHTML = items.map(b => `
         <tr data-id="${b._id}">
           <td>
@@ -833,8 +840,8 @@
         });
       });
     } catch (e) {
-      console.error(e);
-      bookingMsg.textContent = 'Không kết nối được máy chủ.';
+      console.error('loadBookingsForTrip error:', e);
+      bookingMsg.textContent = `Không tải được vé. (HTTP ${e.status || '?'}) ${e.message || ''}`;
     }
   }
 
@@ -846,21 +853,16 @@
 
   async function updateBookingStatus(id, status) {
     try {
-      const res = await fetch(API_BASE + '/api/employee/bookings/' + id + '/status', {
+      await fetchJson(API_BASE + '/api/employee/bookings/' + id + '/status', {
         method: 'PATCH',
         headers: authHeaders(),
         credentials: 'include',
         body: JSON.stringify({ status })
       });
-      const data = await res.json();
-      if (!res.ok) {
-        alert(data.message || 'Cập nhật trạng thái thất bại.');
-        return;
-      }
       bookingMsg.textContent = 'Đã cập nhật trạng thái.';
     } catch (e) {
-      console.error(e);
-      alert('Không kết nối được máy chủ.');
+      console.error('updateBookingStatus error:', e);
+      alert(`Cập nhật trạng thái thất bại. (HTTP ${e.status || '?'}) ${e.message || ''}`);
     }
   }
 
@@ -879,33 +881,52 @@
       return;
     }
 
-    try {
-      const res = await fetch(API_BASE + '/api/shuttles?date=' + encodeURIComponent(dateStr), {
-        headers: authHeaders(),
-        credentials: 'include'
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        shuttleMsg.textContent = data.message || 'Lỗi tải shuttle.';
-        return;
+    // thử /api/shuttles trước, nếu 404 thì fallback /api/shuttle (nhiều bạn mount nhầm)
+    const endpoints = [
+      API_BASE + '/api/shuttles?date=' + encodeURIComponent(dateStr),
+      API_BASE + '/api/shuttle?date=' + encodeURIComponent(dateStr)
+    ];
+
+    let data = null;
+    let lastErr = null;
+
+    for (const url of endpoints) {
+      try {
+        data = await fetchJson(url, {
+          headers: authHeaders(),
+          credentials: 'include'
+        });
+        lastErr = null;
+        break;
+      } catch (e) {
+        lastErr = e;
+        // chỉ fallback khi 404, còn 401/403 thì đừng thử lung tung
+        if (e.status !== 404) break;
       }
+    }
 
-      const items = Array.isArray(data) ? data : (data.items || []);
-      if (!items.length) {
-        shuttleMsg.textContent = 'Chưa có xe trung chuyển nào cho ngày này.';
-        tbShuttles.innerHTML = '';
-        return;
-      }
+    if (lastErr) {
+      console.error('loadShuttles error:', lastErr);
+      shuttleMsg.textContent = `Không tải được shuttle. (HTTP ${lastErr.status || '?'}) ${lastErr.message || ''}`;
+      return;
+    }
 
-      shuttleMsg.textContent = `Có ${items.length} xe trung chuyển. Nhấn "Xem khách" để xem danh sách.`;
+    const items = Array.isArray(data) ? data : (data.items || []);
+    if (!items.length) {
+      shuttleMsg.textContent = 'Chưa có xe trung chuyển nào cho ngày này.';
+      tbShuttles.innerHTML = '';
+      return;
+    }
 
-      tbShuttles.innerHTML = items.map(s => {
-        const hasLocation = typeof s.currentLat === 'number' && typeof s.currentLng === 'number';
-        const statusBadge = hasLocation
-          ? '<span class="badge bg-info text-dark">Đã cập nhật vị trí</span>'
-          : '<span class="badge bg-secondary">Chưa cập nhật vị trí</span>';
+    shuttleMsg.textContent = `Có ${items.length} xe trung chuyển. Nhấn "Xem khách" để xem danh sách.`;
 
-        return `
+    tbShuttles.innerHTML = items.map(s => {
+      const hasLocation = typeof s.currentLat === 'number' && typeof s.currentLng === 'number';
+      const statusBadge = hasLocation
+        ? '<span class="badge bg-info text-dark">Đã cập nhật vị trí</span>'
+        : '<span class="badge bg-secondary">Chưa cập nhật vị trí</span>';
+
+      return `
         <tr data-id="${s._id}">
           <td>
             <div class="fw-semibold">${s.plateNumber}</div>
@@ -924,60 +945,72 @@
             </button>
           </td>
         </tr>
-      `}).join('');
+      `;
+    }).join('');
 
-      tbShuttles.querySelectorAll('.btn-view-shuttle').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-id');
-          const shuttle = items.find(x => x._id === id);
-          if (shuttle) {
-            currentShuttle = shuttle;
-            currentShuttleInfo.textContent =
-              `${shuttle.plateNumber} · ${shuttle.driverName} · ${shuttle.workingDateStr || ''}`;
-            loadShuttleBookings(shuttle._id);
-          }
-        });
+    tbShuttles.querySelectorAll('.btn-view-shuttle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const shuttle = items.find(x => x._id === id);
+        if (shuttle) {
+          currentShuttle = shuttle;
+          currentShuttleInfo.textContent =
+            `${shuttle.plateNumber} · ${shuttle.driverName} · ${shuttle.workingDateStr || ''}`;
+          loadShuttleBookings(shuttle._id);
+        }
       });
-    } catch (e) {
-      console.error(e);
-      shuttleMsg.textContent = 'Không kết nối được máy chủ.';
-    }
+    });
   }
 
   async function loadShuttleBookings(shuttleId) {
     shuttleBookingMsg.textContent = 'Đang tải danh sách khách trung chuyển...';
     tbShuttleBookings.innerHTML = '';
 
-    try {
-      const res = await fetch(API_BASE + '/api/shuttles/' + shuttleId + '/bookings', {
-        headers: authHeaders(),
-        credentials: 'include'
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        shuttleBookingMsg.textContent = data.message || 'Lỗi tải danh sách khách trung chuyển.';
-        return;
+    // thử 2 kiểu mount giống trên
+    const endpoints = [
+      API_BASE + '/api/shuttles/' + shuttleId + '/bookings',
+      API_BASE + '/api/shuttle/' + shuttleId + '/bookings'
+    ];
+
+    let data = null;
+    let lastErr = null;
+
+    for (const url of endpoints) {
+      try {
+        data = await fetchJson(url, { headers: authHeaders(), credentials: 'include' });
+        lastErr = null;
+        break;
+      } catch (e) {
+        lastErr = e;
+        if (e.status !== 404) break;
       }
+    }
 
-      const items = data.items || data || [];
-      if (!items.length) {
-        shuttleBookingMsg.textContent = 'Chưa có khách gán cho xe này.';
-        tbShuttleBookings.innerHTML = '';
-        return;
-      }
+    if (lastErr) {
+      console.error('loadShuttleBookings error:', lastErr);
+      shuttleBookingMsg.textContent = `Không tải được khách trung chuyển. (HTTP ${lastErr.status || '?'}) ${lastErr.message || ''}`;
+      return;
+    }
 
-      shuttleBookingMsg.textContent = `Có ${items.length} khách.`;
+    const items = data.items || data || [];
+    if (!items.length) {
+      shuttleBookingMsg.textContent = 'Chưa có khách gán cho xe này.';
+      tbShuttleBookings.innerHTML = '';
+      return;
+    }
 
-      tbShuttleBookings.innerHTML = items.map(b => {
-        const c = b.customer || {};
-        const transferStatus = b.transferStatus || 'waiting';
-        const transferClass =
-          transferStatus === 'picking' ? 'transfer-picking' :
-          transferStatus === 'picked'  ? 'transfer-picked'  :
-          transferStatus === 'dropped' ? 'transfer-dropped' :
-                                         'transfer-waiting';
+    shuttleBookingMsg.textContent = `Có ${items.length} khách.`;
 
-        return `
+    tbShuttleBookings.innerHTML = items.map(b => {
+      const c = b.customer || {};
+      const transferStatus = b.transferStatus || 'waiting';
+      const transferClass =
+        transferStatus === 'picking' ? 'transfer-picking' :
+        transferStatus === 'picked'  ? 'transfer-picked'  :
+        transferStatus === 'dropped' ? 'transfer-dropped' :
+                                       'transfer-waiting';
+
+      return `
         <tr data-id="${b._id}">
           <td>
             <div class="fw-semibold">${c.name || 'Khách hàng'}</div>
@@ -1014,45 +1047,49 @@
             </div>
           </td>
         </tr>
-        `;
-      }).join('');
+      `;
+    }).join('');
 
-      tbShuttleBookings.querySelectorAll('.btn-update-transfer').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          const tr = btn.closest('tr');
-          const id = tr.getAttribute('data-id');
-          const sel = tr.querySelector('.sel-transfer');
-          const newStatus = sel.value;
-          await updateTransferStatus(id, newStatus);
-          if (currentShuttle) {
-            loadShuttleBookings(currentShuttle._id);
-          }
-        });
+    tbShuttleBookings.querySelectorAll('.btn-update-transfer').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const tr = btn.closest('tr');
+        const id = tr.getAttribute('data-id');
+        const sel = tr.querySelector('.sel-transfer');
+        const newStatus = sel.value;
+        await updateTransferStatus(id, newStatus);
+        if (currentShuttle) {
+          loadShuttleBookings(currentShuttle._id);
+        }
       });
-    } catch (e) {
-      console.error(e);
-      shuttleBookingMsg.textContent = 'Không kết nối được máy chủ.';
-    }
+    });
   }
 
   async function updateTransferStatus(bookingId, transferStatus) {
-    try {
-      const res = await fetch(API_BASE + '/api/shuttles/bookings/' + bookingId + '/transfer-status', {
-        method: 'PATCH',
-        headers: authHeaders(),
-        credentials: 'include',
-        body: JSON.stringify({ transferStatus })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        alert(data.message || 'Cập nhật trạng thái trung chuyển thất bại.');
+    const endpoints = [
+      API_BASE + '/api/shuttles/bookings/' + bookingId + '/transfer-status',
+      API_BASE + '/api/shuttle/bookings/' + bookingId + '/transfer-status'
+    ];
+
+    let lastErr = null;
+
+    for (const url of endpoints) {
+      try {
+        await fetchJson(url, {
+          method: 'PATCH',
+          headers: authHeaders(),
+          credentials: 'include',
+          body: JSON.stringify({ transferStatus })
+        });
+        shuttleBookingMsg.textContent = 'Đã cập nhật trạng thái trung chuyển.';
         return;
+      } catch (e) {
+        lastErr = e;
+        if (e.status !== 404) break;
       }
-      shuttleBookingMsg.textContent = 'Đã cập nhật trạng thái trung chuyển.';
-    } catch (e) {
-      console.error(e);
-      alert('Không kết nối được máy chủ.');
     }
+
+    console.error('updateTransferStatus error:', lastErr);
+    alert(`Cập nhật trạng thái trung chuyển thất bại. (HTTP ${lastErr?.status || '?'}) ${lastErr?.message || ''}`);
   }
 
   // ====== INIT ======
