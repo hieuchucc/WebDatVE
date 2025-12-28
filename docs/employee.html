@@ -867,230 +867,231 @@
   }
 
   // ====== SHUTTLES (TRUNG CHUYỂN) ======
-  async function loadShuttles() {
-    shuttleMsg.textContent = 'Đang tải danh sách xe trung chuyển...';
+  function authHeadersGet() {
+  const t = token();
+  return t ? { Authorization: 'Bearer ' + t } : {};
+}
+
+async function loadShuttles() {
+  shuttleMsg.textContent = 'Đang tải danh sách xe trung chuyển...';
+  tbShuttles.innerHTML = '';
+  currentShuttle = null;
+  tbShuttleBookings.innerHTML = '';
+  shuttleBookingMsg.textContent = 'Chọn một xe trung chuyển để xem danh sách khách.';
+  currentShuttleInfo.textContent = '';
+
+  const dateStr = dateFilter.value;
+  if (!dateStr) {
+    shuttleMsg.textContent = 'Vui lòng chọn ngày (cùng với lịch chạy ở trên).';
+    return;
+  }
+
+  const endpoints = [
+    API_BASE + '/api/shuttles?date=' + encodeURIComponent(dateStr),
+    API_BASE + '/api/shuttle?date=' + encodeURIComponent(dateStr)
+  ];
+
+  let data = null;
+  let lastErr = null;
+
+  for (const url of endpoints) {
+    try {
+      data = await fetchJson(url, {
+        headers: authHeadersGet(),     // ✅ SỬA: dùng header GET nhẹ
+        credentials: 'include'
+      });
+      lastErr = null;
+      break;
+    } catch (e) {
+      lastErr = e;
+      if (e.status !== 404) break; // chỉ thử endpoint khác khi 404
+    }
+  }
+
+  if (lastErr) {
+    console.error('loadShuttles error:', lastErr);
+    shuttleMsg.textContent = `Không tải được shuttle. (HTTP ${lastErr.status || '?'}) ${lastErr.message || ''}`;
+    return;
+  }
+
+  const items = Array.isArray(data) ? data : (data.items || []);
+  if (!items.length) {
+    shuttleMsg.textContent = 'Chưa có xe trung chuyển nào cho ngày này.';
     tbShuttles.innerHTML = '';
-    currentShuttle = null;
-    tbShuttleBookings.innerHTML = '';
-    shuttleBookingMsg.textContent = 'Chọn một xe trung chuyển để xem danh sách khách.';
-    currentShuttleInfo.textContent = '';
+    return;
+  }
 
-    const dateStr = dateFilter.value;
-    if (!dateStr) {
-      shuttleMsg.textContent = 'Vui lòng chọn ngày (cùng với lịch chạy ở trên).';
-      return;
-    }
+  shuttleMsg.textContent = `Có ${items.length} xe trung chuyển. Nhấn "Xem khách" để xem danh sách.`;
 
-    // thử /api/shuttles trước, nếu 404 thì fallback /api/shuttle (nhiều bạn mount nhầm)
-    const endpoints = [
-      API_BASE + '/api/shuttles?date=' + encodeURIComponent(dateStr),
-      API_BASE + '/api/shuttle?date=' + encodeURIComponent(dateStr)
-    ];
+  tbShuttles.innerHTML = items.map(s => {
+    const hasLocation = typeof s.currentLat === 'number' && typeof s.currentLng === 'number';
+    const statusBadge = hasLocation
+      ? '<span class="badge bg-info text-dark">Đã cập nhật vị trí</span>'
+      : '<span class="badge bg-secondary">Chưa cập nhật vị trí</span>';
 
-    let data = null;
-    let lastErr = null;
+    return `
+      <tr data-id="${s._id}">
+        <td>
+          <div class="fw-semibold">${s.plateNumber}</div>
+          ${s.capacity ? `<div class="muted">Sức chứa: ${s.capacity} khách</div>` : ''}
+        </td>
+        <td>
+          <div class="fw-semibold">${s.driverName}</div>
+          <div class="muted">${s.driverPhone}</div>
+        </td>
+        <td>${s.mainRouteCode || '-'}</td>
+        <td>${s.workingDateStr || ''}</td>
+        <td>${statusBadge}</td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-primary btn-view-shuttle" data-id="${s._id}">
+            <i class="bi bi-people"></i> Xem khách
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 
-    for (const url of endpoints) {
-      try {
-        data = await fetchJson(url, {
-          headers: authHeaders(),
-          credentials: 'include'
-        });
-        lastErr = null;
-        break;
-      } catch (e) {
-        lastErr = e;
-        // chỉ fallback khi 404, còn 401/403 thì đừng thử lung tung
-        if (e.status !== 404) break;
+  tbShuttles.querySelectorAll('.btn-view-shuttle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      const shuttle = items.find(x => x._id === id);
+      if (shuttle) {
+        currentShuttle = shuttle;
+        currentShuttleInfo.textContent =
+          `${shuttle.plateNumber} · ${shuttle.driverName} · ${shuttle.workingDateStr || ''}`;
+        loadShuttleBookings(shuttle._id);
       }
+    });
+  });
+}
+
+async function loadShuttleBookings(shuttleId) {
+  shuttleBookingMsg.textContent = 'Đang tải danh sách khách trung chuyển...';
+  tbShuttleBookings.innerHTML = '';
+
+  const endpoints = [
+    API_BASE + '/api/shuttles/' + shuttleId + '/bookings',
+    API_BASE + '/api/shuttle/' + shuttleId + '/bookings'
+  ];
+
+  let data = null;
+  let lastErr = null;
+
+  for (const url of endpoints) {
+    try {
+      data = await fetchJson(url, {
+        headers: authHeadersGet(),     // ✅ SỬA: dùng header GET nhẹ
+        credentials: 'include'
+      });
+      lastErr = null;
+      break;
+    } catch (e) {
+      lastErr = e;
+      if (e.status !== 404) break;
     }
+  }
 
-    if (lastErr) {
-      console.error('loadShuttles error:', lastErr);
-      shuttleMsg.textContent = `Không tải được shuttle. (HTTP ${lastErr.status || '?'}) ${lastErr.message || ''}`;
-      return;
-    }
+  if (lastErr) {
+    console.error('loadShuttleBookings error:', lastErr);
+    shuttleBookingMsg.textContent = `Không tải được khách trung chuyển. (HTTP ${lastErr.status || '?'}) ${lastErr.message || ''}`;
+    return;
+  }
 
-    const items = Array.isArray(data) ? data : (data.items || []);
-    if (!items.length) {
-      shuttleMsg.textContent = 'Chưa có xe trung chuyển nào cho ngày này.';
-      tbShuttles.innerHTML = '';
-      return;
-    }
+  const items = data.items || data || [];
+  if (!items.length) {
+    shuttleBookingMsg.textContent = 'Chưa có khách gán cho xe này.';
+    tbShuttleBookings.innerHTML = '';
+    return;
+  }
 
-    shuttleMsg.textContent = `Có ${items.length} xe trung chuyển. Nhấn "Xem khách" để xem danh sách.`;
+  shuttleBookingMsg.textContent = `Có ${items.length} khách.`;
 
-    tbShuttles.innerHTML = items.map(s => {
-      const hasLocation = typeof s.currentLat === 'number' && typeof s.currentLng === 'number';
-      const statusBadge = hasLocation
-        ? '<span class="badge bg-info text-dark">Đã cập nhật vị trí</span>'
-        : '<span class="badge bg-secondary">Chưa cập nhật vị trí</span>';
+  tbShuttleBookings.innerHTML = items.map(b => {
+    const c = b.customer || {};
+    const transferStatus = b.transferStatus || 'waiting';
+    const transferClass =
+      transferStatus === 'picking' ? 'transfer-picking' :
+      transferStatus === 'picked'  ? 'transfer-picked'  :
+      transferStatus === 'dropped' ? 'transfer-dropped' :
+                                     'transfer-waiting';
 
-      return `
-        <tr data-id="${s._id}">
-          <td>
-            <div class="fw-semibold">${s.plateNumber}</div>
-            ${s.capacity ? `<div class="muted">Sức chứa: ${s.capacity} khách</div>` : ''}
-          </td>
-          <td>
-            <div class="fw-semibold">${s.driverName}</div>
-            <div class="muted">${s.driverPhone}</div>
-          </td>
-          <td>${s.mainRouteCode || '-'}</td>
-          <td>${s.workingDateStr || ''}</td>
-          <td>${statusBadge}</td>
-          <td class="text-end">
-            <button class="btn btn-sm btn-outline-primary btn-view-shuttle" data-id="${s._id}">
-              <i class="bi bi-people"></i> Xem khách
+    return `
+      <tr data-id="${b._id}">
+        <td>
+          <div class="fw-semibold">${c.name || 'Khách hàng'}</div>
+          <div class="muted">${c.phone || ''}</div>
+        </td>
+        <td>
+          <div><strong>Đón:</strong> ${c.pickupAddress || c.pickupPoint || '-'}</div>
+          <div><strong>Trả:</strong> ${c.dropoffAddress || c.dropoffPoint || '-'}</div>
+        </td>
+        <td><div class="muted">${c.transferTimeNote || ''}</div></td>
+        <td>
+          <span class="status-pill ${transferClass}">
+            ${
+              transferStatus === 'picking' ? 'Đang đi đón' :
+              transferStatus === 'picked'  ? 'Đã đón'      :
+              transferStatus === 'dropped' ? 'Đã trả'      :
+                                             'Chờ đón'
+            }
+          </span>
+        </td>
+        <td class="text-end">
+          <div class="d-flex align-items-center gap-1">
+            <select class="form-select form-select-sm sel-transfer" style="max-width:145px;">
+              <option value="waiting"  ${transferStatus==='waiting'?'selected':''}>Chờ đón</option>
+              <option value="picking"  ${transferStatus==='picking'?'selected':''}>Đang đi đón</option>
+              <option value="picked"   ${transferStatus==='picked'?'selected':''}>Đã đón</option>
+              <option value="dropped"  ${transferStatus==='dropped'?'selected':''}>Đã trả khách</option>
+            </select>
+            <button class="btn btn-sm btn-outline-success btn-update-transfer">
+              <i class="bi bi-check2"></i>
             </button>
-          </td>
-        </tr>
-      `;
-    }).join('');
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 
-    tbShuttles.querySelectorAll('.btn-view-shuttle').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.getAttribute('data-id');
-        const shuttle = items.find(x => x._id === id);
-        if (shuttle) {
-          currentShuttle = shuttle;
-          currentShuttleInfo.textContent =
-            `${shuttle.plateNumber} · ${shuttle.driverName} · ${shuttle.workingDateStr || ''}`;
-          loadShuttleBookings(shuttle._id);
-        }
-      });
+  tbShuttleBookings.querySelectorAll('.btn-update-transfer').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const tr = btn.closest('tr');
+      const id = tr.getAttribute('data-id');
+      const sel = tr.querySelector('.sel-transfer');
+      const newStatus = sel.value;
+      await updateTransferStatus(id, newStatus);
+      if (currentShuttle) loadShuttleBookings(currentShuttle._id);
     });
-  }
+  });
+}
 
-  async function loadShuttleBookings(shuttleId) {
-    shuttleBookingMsg.textContent = 'Đang tải danh sách khách trung chuyển...';
-    tbShuttleBookings.innerHTML = '';
+async function updateTransferStatus(bookingId, transferStatus) {
+  const endpoints = [
+    API_BASE + '/api/shuttles/bookings/' + bookingId + '/transfer-status',
+    API_BASE + '/api/shuttle/bookings/' + bookingId + '/transfer-status'
+  ];
 
-    // thử 2 kiểu mount giống trên
-    const endpoints = [
-      API_BASE + '/api/shuttles/' + shuttleId + '/bookings',
-      API_BASE + '/api/shuttle/' + shuttleId + '/bookings'
-    ];
+  let lastErr = null;
 
-    let data = null;
-    let lastErr = null;
-
-    for (const url of endpoints) {
-      try {
-        data = await fetchJson(url, { headers: authHeaders(), credentials: 'include' });
-        lastErr = null;
-        break;
-      } catch (e) {
-        lastErr = e;
-        if (e.status !== 404) break;
-      }
-    }
-
-    if (lastErr) {
-      console.error('loadShuttleBookings error:', lastErr);
-      shuttleBookingMsg.textContent = `Không tải được khách trung chuyển. (HTTP ${lastErr.status || '?'}) ${lastErr.message || ''}`;
-      return;
-    }
-
-    const items = data.items || data || [];
-    if (!items.length) {
-      shuttleBookingMsg.textContent = 'Chưa có khách gán cho xe này.';
-      tbShuttleBookings.innerHTML = '';
-      return;
-    }
-
-    shuttleBookingMsg.textContent = `Có ${items.length} khách.`;
-
-    tbShuttleBookings.innerHTML = items.map(b => {
-      const c = b.customer || {};
-      const transferStatus = b.transferStatus || 'waiting';
-      const transferClass =
-        transferStatus === 'picking' ? 'transfer-picking' :
-        transferStatus === 'picked'  ? 'transfer-picked'  :
-        transferStatus === 'dropped' ? 'transfer-dropped' :
-                                       'transfer-waiting';
-
-      return `
-        <tr data-id="${b._id}">
-          <td>
-            <div class="fw-semibold">${c.name || 'Khách hàng'}</div>
-            <div class="muted">${c.phone || ''}</div>
-          </td>
-          <td>
-            <div><strong>Đón:</strong> ${c.pickupAddress || c.pickupPoint || '-'}</div>
-            <div><strong>Trả:</strong> ${c.dropoffAddress || c.dropoffPoint || '-'}</div>
-          </td>
-          <td>
-            <div class="muted">${c.transferTimeNote || ''}</div>
-          </td>
-          <td>
-            <span class="status-pill ${transferClass}">
-              ${
-                transferStatus === 'picking' ? 'Đang đi đón' :
-                transferStatus === 'picked'  ? 'Đã đón'      :
-                transferStatus === 'dropped' ? 'Đã trả'      :
-                                               'Chờ đón'
-              }
-            </span>
-          </td>
-          <td class="text-end">
-            <div class="d-flex align-items-center gap-1">
-              <select class="form-select form-select-sm sel-transfer" style="max-width:145px;">
-                <option value="waiting"  ${transferStatus==='waiting'?'selected':''}>Chờ đón</option>
-                <option value="picking"  ${transferStatus==='picking'?'selected':''}>Đang đi đón</option>
-                <option value="picked"   ${transferStatus==='picked'?'selected':''}>Đã đón</option>
-                <option value="dropped"  ${transferStatus==='dropped'?'selected':''}>Đã trả khách</option>
-              </select>
-              <button class="btn btn-sm btn-outline-success btn-update-transfer">
-                <i class="bi bi-check2"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-
-    tbShuttleBookings.querySelectorAll('.btn-update-transfer').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const tr = btn.closest('tr');
-        const id = tr.getAttribute('data-id');
-        const sel = tr.querySelector('.sel-transfer');
-        const newStatus = sel.value;
-        await updateTransferStatus(id, newStatus);
-        if (currentShuttle) {
-          loadShuttleBookings(currentShuttle._id);
-        }
+  for (const url of endpoints) {
+    try {
+      await fetchJson(url, {
+        method: 'PATCH',
+        headers: authHeaders(),        // ✅ PATCH vẫn dùng Content-Type + Authorization
+        credentials: 'include',
+        body: JSON.stringify({ transferStatus })
       });
-    });
-  }
-
-  async function updateTransferStatus(bookingId, transferStatus) {
-    const endpoints = [
-      API_BASE + '/api/shuttles/bookings/' + bookingId + '/transfer-status',
-      API_BASE + '/api/shuttle/bookings/' + bookingId + '/transfer-status'
-    ];
-
-    let lastErr = null;
-
-    for (const url of endpoints) {
-      try {
-        await fetchJson(url, {
-          method: 'PATCH',
-          headers: authHeaders(),
-          credentials: 'include',
-          body: JSON.stringify({ transferStatus })
-        });
-        shuttleBookingMsg.textContent = 'Đã cập nhật trạng thái trung chuyển.';
-        return;
-      } catch (e) {
-        lastErr = e;
-        if (e.status !== 404) break;
-      }
+      shuttleBookingMsg.textContent = 'Đã cập nhật trạng thái trung chuyển.';
+      return;
+    } catch (e) {
+      lastErr = e;
+      if (e.status !== 404) break;
     }
-
-    console.error('updateTransferStatus error:', lastErr);
-    alert(`Cập nhật trạng thái trung chuyển thất bại. (HTTP ${lastErr?.status || '?'}) ${lastErr?.message || ''}`);
   }
+
+  console.error('updateTransferStatus error:', lastErr);
+  alert(`Cập nhật trạng thái trung chuyển thất bại. (HTTP ${lastErr?.status || '?'}) ${lastErr?.message || ''}`);
+}
 
   // ====== INIT ======
   document.addEventListener('DOMContentLoaded', async () => {
